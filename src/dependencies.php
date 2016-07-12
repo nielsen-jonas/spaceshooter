@@ -17,3 +17,13 @@ $container['logger'] = function ($c) {
     $logger->pushHandler(new Monolog\Handler\StreamHandler($settings['path'], Monolog\Logger::DEBUG));
     return $logger;
 };
+
+// twig
+$container['twig'] = function ($c) {
+	$settings = $c->get('settings')['twig'];
+	$loader = new Twig_Loader_Filesystem($settings['template_path']);
+	$twig = new Twig_Environment($loader, [
+		'cache' => $settings['cache_path']
+	]);
+	return $twig;
+};
