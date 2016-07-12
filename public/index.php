@@ -17,6 +17,16 @@ session_start();
 $settings = require __DIR__ . '/../src/settings.php';
 $app = new \Slim\App($settings);
 
+// Site configuration
+$app->website = [
+    'name' => 'Slim',
+    'url' => 'http://slim'
+];
+$app->resource = [
+    'css' => $app->website['url'] . '/css/',
+    'js' => $app->website['url'] . '/js/'
+];
+
 // Set up dependencies
 require __DIR__ . '/../src/dependencies.php';
 

@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block title %}WebGL Test{% endblock %}
+{% block head %}
+    {{ parent() }}
+    <style>
+        body { text-align: center; }
+    </style>
+{% endblock %}
+{% block content %}
+    <h1>WebGL Test</h1>
+    <iframe src="{{ website.url ~ '/webgl/test/fullscreen' }}" width="960" height="540" scrolling="no" ></iframe>
+{% endblock %}
