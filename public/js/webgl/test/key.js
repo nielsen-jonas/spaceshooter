@@ -6,7 +6,8 @@ var key = {
     yaw: {
         left: false,
         right: false
-    }
+    },
+    fire: false
 }
 
 // Thrust
@@ -95,4 +96,12 @@ Mousetrap.bind('6', function() {
 }, 'keydown');
 Mousetrap.bind('6', function() {
     key.yaw.right = false;
+}, 'keyup');
+
+// Fire
+Mousetrap.bind('f', function() {
+    key.fire = true;
+}, 'keydown');
+Mousetrap.bind('f', function() {
+    key.fire = false;
 }, 'keyup');
