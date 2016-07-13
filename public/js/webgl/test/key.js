@@ -1,73 +1,98 @@
 // Controls
 var key = {
-    down: {
-        w: false,
-        a: false,
-        s: false,
-        d: false,
-        q: false
+    thrust: false,
+    break: false,
+    stall: false,
+    yaw: {
+        left: false,
+        right: false
     }
-};
+}
 
-Mousetrap.bind('w', function() {
-    key.down.w = true;
-}, 'keydown');
-Mousetrap.bind('w', function() {
-    key.down.w = false;
-}, 'keyup');
-
-Mousetrap.bind('a', function() {
-    key.down.a = true;
-}, 'keydown');
-Mousetrap.bind('a', function() {
-    key.down.a = false;
-}, 'keyup');
-
-Mousetrap.bind('s', function() {
-    key.down.s = true;
-}, 'keydown');
-Mousetrap.bind('s', function() {
-    key.down.s = false;
-}, 'keyup');
-
-Mousetrap.bind('d', function() {
-    key.down.d = true;
-}, 'keydown');
-Mousetrap.bind('d', function() {
-    key.down.d = false;
-}, 'keyup');
-
+// Thrust
 Mousetrap.bind('up', function() {
-    key.down.up = true;
+    key.thrust = true;
 }, 'keydown');
 Mousetrap.bind('up', function() {
-    key.down.up = false;
+    key.thrust = false;
+}, 'keyup');
+Mousetrap.bind('i', function() {
+    key.thrust = true;
+}, 'keydown');
+Mousetrap.bind('i', function() {
+    key.thrust = false;
+}, 'keyup');
+Mousetrap.bind('8', function() {
+    key.thrust = true;
+}, 'keydown');
+Mousetrap.bind('8', function() {
+    key.thrust = false;
 }, 'keyup');
 
+// Break
 Mousetrap.bind('down', function() {
-    key.down.down = true;
+    key.break = true;
 }, 'keydown');
 Mousetrap.bind('down', function() {
-    key.down.down = false;
+    key.break = false;
+}, 'keyup');
+Mousetrap.bind('k', function() {
+    key.break = true;
+}, 'keydown');
+Mousetrap.bind('k', function() {
+    key.break = false;
+}, 'keyup');
+Mousetrap.bind('5', function() {
+    key.break = true;
+}, 'keydown');
+Mousetrap.bind('5', function() {
+    key.break = false;
 }, 'keyup');
 
+// Stall
+Mousetrap.bind('a', function() {
+    key.stall = true;
+}, 'keydown');
+Mousetrap.bind('a', function() {
+    key.stall = false;
+}, 'keyup');
+
+// Yaw Left
 Mousetrap.bind('left', function() {
-    key.down.left = true;
+    key.yaw.left = true;
 }, 'keydown');
 Mousetrap.bind('left', function() {
-    key.down.left = false;
+    key.yaw.left = false;
+}, 'keyup');
+Mousetrap.bind('j', function() {
+    key.yaw.left = true;
+}, 'keydown');
+Mousetrap.bind('j', function() {
+    key.yaw.left = false;
+}, 'keyup');
+Mousetrap.bind('4', function() {
+    key.yaw.left = true;
+}, 'keydown');
+Mousetrap.bind('4', function() {
+    key.yaw.left = false;
 }, 'keyup');
 
+// Yaw right
 Mousetrap.bind('right', function() {
-    key.down.right = true;
+    key.yaw.right = true;
 }, 'keydown');
 Mousetrap.bind('right', function() {
-    key.down.right = false;
+    key.yaw.right = false;
 }, 'keyup');
-
-Mousetrap.bind('q', function() {
-    key.down.q = true;
+Mousetrap.bind('l', function() {
+    key.yaw.right = true;
 }, 'keydown');
-Mousetrap.bind('q', function() {
-    key.down.q = false;
+Mousetrap.bind('l', function() {
+    key.yaw.right = false;
+}, 'keyup');
+Mousetrap.bind('6', function() {
+    key.yaw.right = true;
+}, 'keydown');
+Mousetrap.bind('6', function() {
+    key.yaw.right = false;
 }, 'keyup');

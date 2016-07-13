@@ -13,21 +13,17 @@ var player = {
     acceleration: {
         thrust: 1.5,
         break: 1,
-        rotation: 0.1
+        rotation: 0.2
+    },
+    passive_deceleration: {
+        break: 0.1,
+        rotation: 0.02
     }
 }
 
 var view = {
     width: 42.87,
     height: 24
-}
-
-function toRadians (angle) {
-    return angle * (Math.PI / 180);
-}
-
-function toDegrees (angle) {
-    return angle * (180 / Math.PI);
 }
 
 // Rendering the scene
@@ -62,39 +58,24 @@ function render() {
     }
 
     // Input
-    if (key.down.q) {
-        // Decelerate rotation
-        if (player.inertia.rotation != 0) {
-            if (Math.abs(player.inertia.rotation) < player.acceleration.rotation) {
-                player.inertia.rotation = 0;
-            } else if (player.inertia.rotation > 0) {
-                player.inertia.rotation -= player.acceleration.rotation;
-            } else if (player.inertia.rotation < 0) {
-                player.inertia.rotation += player.acceleration.rotation;
-            }
-        }
-        
-        // Fix inertia
-        if (player.velocity.magnitude > 0) {
-            player.inertia.x -= Math.cos(toRadians(player.velocity.direction)) * player.acceleration.break;
-            player.inertia.y -= Math.sin(toRadians(player.velocity.direction)) * player.acceleration.break;
-        }
+    if (key.stall) {
+        activeDeceleration();
     } else {
-        if (key.down.w || key.down.up) {
+        passiveDeceleration();
+    }
+        if (key.break) {
+            player.inertia.x -= Math.cos(toRadians(player.direction)) * player.acceleration.break;
+            player.inertia.y -= Math.sin(toRadians(player.direction)) * player.acceleration.break;
+        } else if (key.thrust) {
             player.inertia.x += Math.cos(toRadians(player.direction)) * player.acceleration.thrust;
             player.inertia.y += Math.sin(toRadians(player.direction)) * player.acceleration.thrust;
         }
-        if (key.down.s || key.down.down) {
-            player.inertia.x -= Math.cos(toRadians(player.direction)) * player.acceleration.break;
-            player.inertia.y -= Math.sin(toRadians(player.direction)) * player.acceleration.break;
-        }
-        if (key.down.a || key.down.left) {
+        if (key.yaw.left) {
             player.inertia.rotation += player.acceleration.rotation;
         }
-        if (key.down.d || key.down.right) {
+        if (key.yaw.right) {
             player.inertia.rotation -= player.acceleration.rotation;
         }
-    }
     
     // Update position
     spaceship.position.x += player.inertia.x / 400;
@@ -118,3 +99,57 @@ function render() {
     renderer.render( scene, camera );
 }
 render();
+
+function toRadians (angle) {
+    return angle * (Math.PI / 180);
+}
+
+function toDegrees (angle) {
+    return angle * (180 / Math.PI);
+}
+
+function passiveDeceleration () {
+    // Decelerate rotation
+    if (!key.yaw.left && !key.yaw.right) {
+        if (player.inertia.rotation != 0) {
+            if (Math.abs(player.inertia.rotation) < player.acceleration.rotation) {
+                player.inertia.rotation = 0;
+            } else if (player.inertia.rotation > 0) {
+                player.inertia.rotation -= player.passive_deceleration.rotation;
+            } else if (player.inertia.rotation < 0) {
+                player.inertia.rotation += player.passive_deceleration.rotation;
+            }
+        }
+    }
+    
+    // Fix inertia
+    if (!key.thrust && !key.break) {
+        if (player.velocity.magnitude > 0) {
+            player.inertia.x -= Math.cos(toRadians(player.velocity.direction)) * player.passive_deceleration.break;
+            player.inertia.y -= Math.sin(toRadians(player.velocity.direction)) * player.passive_deceleration.break;
+        }
+    }
+}
+
+function activeDeceleration () {
+    // Decelerate rotation
+    if (!key.yaw.left && !key.yaw.right) {
+        if (player.inertia.rotation != 0) {
+            if (Math.abs(player.inertia.rotation) < player.acceleration.rotation) {
+                player.inertia.rotation = 0;
+            } else if (player.inertia.rotation > 0) {
+                player.inertia.rotation -= player.acceleration.rotation;
+            } else if (player.inertia.rotation < 0) {
+                player.inertia.rotation += player.acceleration.rotation;
+            }
+        }
+    }
+    
+    // Fix inertia
+    if (!key.thrust && !key.break) {
+        if (player.velocity.magnitude > 0) {
+            player.inertia.x -= Math.cos(toRadians(player.velocity.direction)) * player.acceleration.break;
+            player.inertia.y -= Math.sin(toRadians(player.velocity.direction)) * player.acceleration.break;
+        }
+    }
+}
