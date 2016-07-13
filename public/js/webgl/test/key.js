@@ -4,7 +4,8 @@ var key = {
         w: false,
         a: false,
         s: false,
-        d: false
+        d: false,
+        q: false
     }
 };
 
@@ -34,4 +35,39 @@ Mousetrap.bind('d', function() {
 }, 'keydown');
 Mousetrap.bind('d', function() {
     key.down.d = false;
+}, 'keyup');
+
+Mousetrap.bind('up', function() {
+    key.down.up = true;
+}, 'keydown');
+Mousetrap.bind('up', function() {
+    key.down.up = false;
+}, 'keyup');
+
+Mousetrap.bind('down', function() {
+    key.down.down = true;
+}, 'keydown');
+Mousetrap.bind('down', function() {
+    key.down.down = false;
+}, 'keyup');
+
+Mousetrap.bind('left', function() {
+    key.down.left = true;
+}, 'keydown');
+Mousetrap.bind('left', function() {
+    key.down.left = false;
+}, 'keyup');
+
+Mousetrap.bind('right', function() {
+    key.down.right = true;
+}, 'keydown');
+Mousetrap.bind('right', function() {
+    key.down.right = false;
+}, 'keyup');
+
+Mousetrap.bind('q', function() {
+    key.down.q = true;
+}, 'keydown');
+Mousetrap.bind('q', function() {
+    key.down.q = false;
 }, 'keyup');
