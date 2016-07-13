@@ -5,9 +5,27 @@
     {{ parent() }}
     <style>
         body { text-align: center; }
+        #controls {
+        	width: 960px;
+        	margin: 0 auto;
+        	text-align: left;
+        }
     </style>
 {% endblock %}
 {% block content %}
     <h1>WebGL Test</h1>
     <iframe src="{{ website.url ~ '/webgl/test/fullscreen' }}" width="960" height="540" scrolling="no" ></iframe>
+    <section id="controls">
+        <h2>Controls</h2>
+        <dl>
+            <dt>Movement</dt>
+            <dd>I, J, K, L</dd>
+            <dd>Up, Left, Down, Right</dd>
+            <dd>8, 4, 5, 6</dd>
+            <dt>Stall</dt>
+            <dd>A</dd>
+            <dt>Fire</dt>
+            <dd>F</dd>
+        </dl>
+    </section>
 {% endblock %}
