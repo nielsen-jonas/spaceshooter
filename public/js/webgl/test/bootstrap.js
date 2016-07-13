@@ -24,6 +24,8 @@ var camera = new THREE.PerspectiveCamera (
     config.camera.clippingPlane.far
 );
 
+camera.position.z = 16;
+
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize (
     config.renderer.width,

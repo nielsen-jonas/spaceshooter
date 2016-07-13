@@ -4,8 +4,13 @@ var material = new THREE.MeshLambertMaterial( { color: 0x00ff00 } );
 var cube = new THREE.Mesh( geometry, material );
 scene.add( cube );
 
-// Positioning the camera
-camera.position.z = 5;
+var geometry = new THREE.ConeGeometry( .4, 1.2 );
+var material = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
+var spaceship = new THREE.Mesh( geometry, material );
+scene.add( spaceship );
+
+// Positioning
+cube.position.x = -5;
 
 // Lights
 var ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
