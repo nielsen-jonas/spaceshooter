@@ -75,8 +75,10 @@ function render() {
         }
         
         // Fix inertia
-        player.inertia.x -= Math.cos(toRadians(player.velocity.direction)) * player.acceleration.break;
-        player.inertia.y -= Math.sin(toRadians(player.velocity.direction)) * player.acceleration.break;
+        if (player.velocity.magnitude > 0) {
+            player.inertia.x -= Math.cos(toRadians(player.velocity.direction)) * player.acceleration.break;
+            player.inertia.y -= Math.sin(toRadians(player.velocity.direction)) * player.acceleration.break;
+        }
     } else {
         if (key.down.w || key.down.up) {
             player.inertia.x += Math.cos(toRadians(player.direction)) * player.acceleration.thrust;
