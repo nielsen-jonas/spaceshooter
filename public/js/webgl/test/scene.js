@@ -9,13 +9,8 @@ scene.add( background );
 var textureFlare = new THREE.TextureLoader().load( "http://slim/img/lensflare.png" );
 var flareColor = new THREE.Color( 0xffffff );
 var position = new THREE.Vector3(0,0,0);
-var star = addLensFlare( textureFlare, flareColor, position, 2, true);
+var star = addLensFlare( textureFlare, flareColor, position, 2, false);
 scene.add( star );
-
-var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-var material = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
-var cube = new THREE.Mesh( geometry, material );
-scene.add( cube );
 
 var geometry = new THREE.SphereGeometry( 1 );
 var material = new THREE.MeshLambertMaterial({
@@ -24,7 +19,7 @@ var material = new THREE.MeshLambertMaterial({
 var rock = new THREE.Mesh( geometry, material );
 scene.add( rock );
 
-var geometry = new THREE.ConeGeometry( .4, 1.2 );
+var geometry = new THREE.CylinderGeometry( .2, .6, 1.4, 16 );
 var material = new THREE.MeshLambertMaterial({
     map: THREE.ImageUtils.loadTexture('http://slim/img/rasta.jpg')
 });
@@ -36,19 +31,18 @@ background.position.z = -330;
 star.position.z = -200;
 star.position.x = -190;
 star.position.y = 72;
-cube.position.x = -5;
 rock.position.x = 5;
 rock.rotation.z = 2;
 
 // Lights
 var ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
-var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-directionalLight.position.set( -1, 1, 1 );
+var directionalLight = new THREE.DirectionalLight( 0xffffff, .8 );
+directionalLight.position.set( -80, 40, 60 );
 scene.add( ambientLight );
 scene.add( directionalLight );
 
 // Projectiles
-var projectile_geometry = new THREE.CylinderGeometry( .1, .1, 1, 4 );
+var projectile_geometry = new THREE.PlaneGeometry( .2, 1.2, 1 );
 var projectile_material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 var projectiles = [];
 function fire ( origin_x, origin_y, inertia_x, inertia_y, rotation_z ) {

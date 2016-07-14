@@ -23,7 +23,7 @@ var player = {
     weapon: {
         blaster: {
             firerate: 0.05,
-            recoil: 3,
+            recoil: 1.8,
             overheat: 0.01,
             cooldown: 0.995
         }
