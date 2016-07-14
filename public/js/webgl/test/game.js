@@ -12,12 +12,21 @@ var player = {
     direction: 0,
     acceleration: {
         thrust: 1.5,
+        strafe: .8,
         break: 1,
-        rotation: 0.2
+        rotation: 0.1
     },
     passive_deceleration: {
         break: 0.1,
         rotation: 0.01
+    },
+    weapon: {
+        blaster: {
+            firerate: 0.05,
+            recoil: 3,
+            overheat: 0.01,
+            cooldown: 0.995
+        }
     }
 }
 
@@ -26,32 +35,55 @@ var view = {
     height: 24
 }
 
+fireTimer = new THREE.Clock( true );
+firerate = player.weapon.blaster.firerate;
 // Rendering the scene
 function render() {
     requestAnimationFrame( render );
     
+    // Update rock
+    rock.rotation.z += 0.1;
+
     // Bullet animation
     var tmp = [];
     projectiles.forEach(function(projectile, index) {
+        // Update position
         projectile.position.x += projectile.inertia.x;
         projectile.position.y += projectile.inertia.y;
         projectile.translateY(.6);
+        projectile.timer --;
+        
+        if (sphereCollision( projectile, rock )) {
+            projectile.alive = false;
+        } else if ( outsideView( projectile ) ) {
+            projectile.alive = false;
+        } else if (projectile.timer <= 0) {
+            projectile.alive = false;
+        }
 
-        // Kill projectile
-        if ( projectile.position.x < -(view.width / 2) ||
-            projectile.position.x > (view.width / 2) ||
-            projectile.position.y < -(view.height / 2) ||
-            projectile.position.y > (view.height / 2)) {
-            scene.remove(projectile);
+        if (projectile.alive) {
+            tmp.push( projectile );
         } else {
-            tmp.push(projectile);
+            // Kill projectile
+            killProjectile( projectile );
         }
     });
     projectiles = tmp;
 
     // Fire bullet
     if (key.fire) {
-        fire(spaceship.position.x, spaceship.position.y, player.inertia.x, player.inertia.y, spaceship.rotation.z);
+        if (fireTimer.getElapsedTime() >= firerate) {
+            firerate += player.weapon.blaster.overheat;
+            fireTimer = new THREE.Clock( true );
+            fire(spaceship.position.x, spaceship.position.y, player.inertia.x, player.inertia.y, spaceship.rotation.z);
+            // recoil
+            if (!key.stall) {
+                player.inertia.x -= Math.cos(toRadians(player.direction)) * player.weapon.blaster.recoil;
+                player.inertia.y -= Math.sin(toRadians(player.direction)) * player.weapon.blaster.recoil;
+            }
+        }
+    } else if (firerate > player.weapon.blaster.firerate) {
+        firerate *= player.weapon.blaster.cooldown;
     }
 
     // Physics: Player rotation
@@ -81,24 +113,35 @@ function render() {
         player.direction += 360;
     }
 
-    // Input
+    // Controls
     if (key.stall) {
         activeDeceleration();
     } else {
         passiveDeceleration();
     }
-    if (key.break) {
-        player.inertia.x -= Math.cos(toRadians(player.direction)) * player.acceleration.break;
-        player.inertia.y -= Math.sin(toRadians(player.direction)) * player.acceleration.break;
-    } else if (key.thrust) {
+
+    if (key.thrust) {
         player.inertia.x += Math.cos(toRadians(player.direction)) * player.acceleration.thrust;
         player.inertia.y += Math.sin(toRadians(player.direction)) * player.acceleration.thrust;
+    } else if (key.break) {
+        player.inertia.x -= Math.cos(toRadians(player.direction)) * player.acceleration.break;
+        player.inertia.y -= Math.sin(toRadians(player.direction)) * player.acceleration.break;
     }
+
     if (key.yaw.left) {
         player.inertia.rotation += player.acceleration.rotation;
     }
     if (key.yaw.right) {
         player.inertia.rotation -= player.acceleration.rotation;
+    }
+
+    if (key.strafe.left) {
+        player.inertia.x += Math.cos(toRadians(player.direction+90)) * player.acceleration.strafe;
+        player.inertia.y += Math.sin(toRadians(player.direction+90)) * player.acceleration.strafe;
+    }
+    if (key.strafe.right) {
+        player.inertia.x += Math.cos(toRadians(player.direction-90)) * player.acceleration.strafe;
+        player.inertia.y += Math.sin(toRadians(player.direction-90)) * player.acceleration.strafe;
     }
     
     // Update position
@@ -107,22 +150,53 @@ function render() {
     spaceship.rotation.z = toRadians((player.direction-90));
 
     // Lock: position
-    if (spaceship.position.x < -(view.width / 2)) {
-        spaceship.position.x += view.width;
-    }
-    if (spaceship.position.x > (view.width / 2)) {
-        spaceship.position.x -= view.width;
-    }
-    if (spaceship.position.y < -(view.height / 2)) {
-        spaceship.position.y += view.height;
-    }
-    if (spaceship.position.y > (view.height / 2)) {
-        spaceship.position.y -= view.height;
-    }
+    limitToView ( spaceship );
 
     renderer.render( scene, camera );
 }
 render();
+
+function limitToView ( object ) {
+    if (object.position.x < -(view.width / 2)) {
+        object.position.x += view.width;
+    }
+    if (object.position.x > (view.width / 2)) {
+        object.position.x -= view.width;
+    }
+    if (object.position.y < -(view.height / 2)) {
+        object.position.y += view.height;
+    }
+    if (object.position.y > (view.height / 2)) {
+        object.position.y -= view.height;
+    }
+}
+
+function outsideView ( object ) {
+    return (object.position.x < -(view.width / 2) ||
+    object.position.x > (view.width / 2) ||
+    object.position.y < -(view.height / 2) ||
+    object.position.y > (view.height / 2));
+}
+
+function sphereCollision (a, b) {
+    if (a.position.x > (b.position.x + b.scale.x)) {
+        return false;
+    }
+    if (a.position.x < (b.position.x - b.scale.x)) {
+        return false;
+    }
+    if (a.position.y > (b.position.y + b.scale.y)) {
+        return false;
+    }
+    if (a.position.y < (b.position.y - b.scale.y)) {
+        return false;
+    }
+    return true;
+}
+
+function killProjectile ( projectile ) {
+    scene.remove( projectile );
+};
 
 function toRadians (angle) {
     return angle * (Math.PI / 180);
@@ -170,7 +244,7 @@ function activeDeceleration () {
     }
     
     // Fix inertia
-    if (!key.thrust && !key.break) {
+    if (!key.thrust && !key.break && !key.strafe.left && !key.strafe.right) {
         if (player.velocity.magnitude > 0) {
             player.inertia.x -= Math.cos(toRadians(player.velocity.direction)) * player.acceleration.break;
             player.inertia.y -= Math.sin(toRadians(player.velocity.direction)) * player.acceleration.break;
