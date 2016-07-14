@@ -68,31 +68,24 @@ function addLensFlare( textureFlare, flareColor, position, size, overrideImage){
   //lensFlare.add( textureFlare, 4096, 0.0, THREE.AdditiveBlending );
   lensFlare.add( textureFlare, 512, 0.0, THREE.AdditiveBlending );
 
-  // and run each through a function below
-  lensFlare.customUpdateCallback = lensFlareUpdateCallback;
-
-  lensFlare.position = position;
-  lensFlare.size = size;
-  return lensFlare;
-}
-
-//  this function will operate over each lensflare artifact, moving them around the screen
-function lensFlareUpdateCallback( object ) {
-  var f, fl = this.lensFlares.length;
+  var f, fl = lensFlare.lensFlares.length;
   var flare;
-  var vecX = -this.positionScreen.x * 2;
-  var vecY = -this.positionScreen.y * 2;
-  var size = object.size ? object.size : 16000;
+  var vecX = -lensFlare.positionScreen.x * 2;
+  var vecY = -lensFlare.positionScreen.y * 2;
 
   var camDistance = camera.position.length();
 
   for( f = 0; f < fl; f ++ ) {
-    flare = this.lensFlares[ f ];
+    flare = lensFlare.lensFlares[ f ];
 
-    flare.x = this.positionScreen.x + vecX * flare.distance;
-    flare.y = this.positionScreen.y + vecY * flare.distance;
+    flare.x = lensFlare.positionScreen.x + vecX * flare.distance;
+    flare.y = lensFlare.positionScreen.y + vecY * flare.distance;
 
     flare.scale = size / camDistance;
     flare.rotation = 0;
   }
+
+  lensFlare.position = position;
+  lensFlare.size = size;
+  return lensFlare;
 }
