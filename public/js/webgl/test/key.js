@@ -11,149 +11,127 @@ var key = {
         left: false,
         right: false
     },
-    fire: false
+    fire: false,
+    calibrate: {
+        forward: false,
+        backward: false
+    }
 }
 
+// Pause
+Mousetrap.bind(['p', 'enter'], function() {
+    alert('P A U S E');
+    return false;
+}, 'keydown')
+
+var keys;
+
 // Thrust
-Mousetrap.bind('up', function() {
+keys = ['up', 'i', '8'];
+Mousetrap.bind(keys, function() {
     key.thrust = true;
     return false;
 }, 'keydown');
-Mousetrap.bind('up', function() {
-    key.thrust = false;
-    return false;
-}, 'keyup');
-Mousetrap.bind('i', function() {
-    key.thrust = true;
-    return false;
-}, 'keydown');
-Mousetrap.bind('i', function() {
-    key.thrust = false;
-    return false;
-}, 'keyup');
-Mousetrap.bind('8', function() {
-    key.thrust = true;
-    return false;
-}, 'keydown');
-Mousetrap.bind('8', function() {
+Mousetrap.bind(keys, function() {
     key.thrust = false;
     return false;
 }, 'keyup');
 
 // Break
-Mousetrap.bind('down', function() {
+keys = ['down', 'k', '5'];
+Mousetrap.bind(keys, function() {
     key.break = true;
     return false;
 }, 'keydown');
-Mousetrap.bind('down', function() {
-    key.break = false;
-    return false;
-}, 'keyup');
-Mousetrap.bind('k', function() {
-    key.break = true;
-    return false;
-}, 'keydown');
-Mousetrap.bind('k', function() {
-    key.break = false;
-    return false;
-}, 'keyup');
-Mousetrap.bind('5', function() {
-    key.break = true;
-    return false;
-}, 'keydown');
-Mousetrap.bind('5', function() {
+Mousetrap.bind(keys, function() {
     key.break = false;
     return false;
 }, 'keyup');
 
 // Stall
-Mousetrap.bind('s', function() {
+keys = 'q';
+Mousetrap.bind(keys, function() {
     key.stall = true;
     return false;
 }, 'keydown');
-Mousetrap.bind('s', function() {
+Mousetrap.bind(keys, function() {
     key.stall = false;
     return false;
 }, 'keyup');
 
 // Yaw Left
-Mousetrap.bind('left', function() {
+keys = ['j', 'left', '4'];
+Mousetrap.bind(keys, function() {
     key.yaw.left = true;
     return false;
 }, 'keydown');
-Mousetrap.bind('left', function() {
-    key.yaw.left = false;
-    return false;
-}, 'keyup');
-Mousetrap.bind('j', function() {
-    key.yaw.left = true;
-    return false;
-}, 'keydown');
-Mousetrap.bind('j', function() {
-    key.yaw.left = false;
-    return false;
-}, 'keyup');
-Mousetrap.bind('4', function() {
-    key.yaw.left = true;
-    return false;
-}, 'keydown');
-Mousetrap.bind('4', function() {
+Mousetrap.bind(keys, function() {
     key.yaw.left = false;
     return false;
 }, 'keyup');
 
 // Yaw right
-Mousetrap.bind('right', function() {
+keys = ['l', 'right', '6'];
+Mousetrap.bind(keys, function() {
     key.yaw.right = true;
     return false;
 }, 'keydown');
-Mousetrap.bind('right', function() {
-    key.yaw.right = false;
-    return false;
-}, 'keyup');
-Mousetrap.bind('l', function() {
-    key.yaw.right = true;
-    return false;
-}, 'keydown');
-Mousetrap.bind('l', function() {
-    key.yaw.right = false;
-    return false;
-}, 'keyup');
-Mousetrap.bind('6', function() {
-    key.yaw.right = true;
-    return false;
-}, 'keydown');
-Mousetrap.bind('6', function() {
+Mousetrap.bind(keys, function() {
     key.yaw.right = false;
     return false;
 }, 'keyup');
 
 // Strafe left
-Mousetrap.bind('a', function() {
+keys = 'a';
+Mousetrap.bind(keys, function() {
     key.strafe.left = true;
     return false;
 }, 'keydown');
-Mousetrap.bind('a', function() {
+Mousetrap.bind(keys, function() {
     key.strafe.left = false;
     return false;
 }, 'keyup');
 
 // Strafe right
-Mousetrap.bind('d', function() {
+keys = 'd';
+Mousetrap.bind(keys, function() {
     key.strafe.right = true;
     return false;
 }, 'keydown');
-Mousetrap.bind('d', function() {
+Mousetrap.bind(keys, function() {
     key.strafe.right = false;
     return false;
 }, 'keyup');
 
+// Calibrate forward
+keys = 'w';
+Mousetrap.bind(keys, function() {
+    key.calibrate.forward = true;
+    return false;
+}, 'keydown');
+Mousetrap.bind(keys, function() {
+    key.calibrate.forward = false;
+    return false;
+}, 'keyup');
+
+// Calibrate backward
+keys = 's';
+Mousetrap.bind(keys, function() {
+    key.calibrate.backward = true;
+    return false;
+}, 'keydown');
+Mousetrap.bind(keys, function() {
+    key.calibrate.backward = false;
+    return false;
+}, 'keyup');
+
 // Fire
-Mousetrap.bind('space', function() {
+keys = 'space';
+Mousetrap.bind(keys, function() {
     key.fire = true;
     return false;
 }, 'keydown');
-Mousetrap.bind('space', function() {
+Mousetrap.bind(keys, function() {
     key.fire = false;
     return false;
 }, 'keyup');

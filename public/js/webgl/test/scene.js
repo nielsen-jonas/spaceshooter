@@ -1,7 +1,8 @@
 // Populating the scene
 var geometry = new THREE.PlaneGeometry( 960, 540);
+var texture = new THREE.TextureLoader().load('http://slim/img/game_bg_a.png')
 var material = new THREE.MeshBasicMaterial({
-    map: THREE.ImageUtils.loadTexture('http://slim/img/game_bg_a.png')
+    map: texture
 });
 var background = new THREE.Mesh( geometry, material );
 scene.add( background );
@@ -13,15 +14,17 @@ var star = addLensFlare( textureFlare, flareColor, position, 2, false);
 scene.add( star );
 
 var geometry = new THREE.SphereGeometry( 1 );
+var texture = new THREE.TextureLoader().load('http://slim/img/rock.jpg');
 var material = new THREE.MeshLambertMaterial({
-    map: THREE.ImageUtils.loadTexture('http://slim/img/rock.jpg')
+    map: texture
 });
 var rock = new THREE.Mesh( geometry, material );
 scene.add( rock );
 
 var geometry = new THREE.CylinderGeometry( .2, .6, 1.4, 16 );
+var texture = new THREE.TextureLoader().load('http://slim/img/rasta.jpg');
 var material = new THREE.MeshLambertMaterial({
-    map: THREE.ImageUtils.loadTexture('http://slim/img/rasta.jpg')
+    map: texture
 });
 var spaceship = new THREE.Mesh( geometry, material );
 scene.add( spaceship );
@@ -43,7 +46,7 @@ scene.add( directionalLight );
 
 // Projectiles
 var projectile_geometry = new THREE.PlaneGeometry( .2, 1.2, 1 );
-var projectile_material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+var projectile_material = new THREE.MeshBasicMaterial( { color: 0xdd0000 } );
 var projectiles = [];
 function fire ( origin_x, origin_y, inertia_x, inertia_y, rotation_z ) {
     var projectile = new THREE.Mesh( projectile_geometry, projectile_material );
