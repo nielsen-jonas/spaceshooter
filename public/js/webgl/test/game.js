@@ -46,6 +46,14 @@ firerate = player.weapon.blaster.firerate;
 function render() {
     requestAnimationFrame( render );
     
+    // TODO: Find out why inertia variables arent arent still when not moving
+    if (Math.abs(player.inertia.x) < .1) {
+        player.inertia.x = 0;
+    }
+    if (Math.abs(player.inertia.y) < .1) {
+        player.inertia.y = 0;
+    }
+
     // Update rock
     rock.rotation.z += 0.1;
     rock.position.x += 0.2;
@@ -63,16 +71,15 @@ function render() {
 
     // Physics: Player rotation
     player.direction += player.inertia.rotation;
+    player.direction = lockDegrees(player.direction + player.inertia.rotation);
 
     // Calculate: player.velocity.direction
-    player.velocity.direction = playerGetVelocityDirection();
+    if (playerGetVelocityDirection()) {
+        player.velocity.direction = lockDegrees(playerGetVelocityDirection());
+    }
 
     // Calculate: player.velocity.magnitude
     player.velocity.magnitude = playerGetVelocityMagnitude();
-
-    // Lock: direction
-    player.direction = lockDegrees(player.direction);
-    player.velocity.direction = lockDegrees(player.velocity.direction);
 
     // Limit: speed
     playerLimitSpeed();
@@ -115,6 +122,7 @@ function render() {
             }
         }
     }
+    console.log(player.inertia.x);
     
     // Update position
     spaceship.position.x += player.inertia.x / 400;
@@ -213,59 +221,54 @@ function playerBreak() {
 }
 
 function playerEqualize(rotate = 0) {
-        if (player.velocity.magnitude > 0) {
-        var DR = lockDegrees(player.direction - (player.velocity.direction) + rotate );
-        var DL = lockDegrees(player.velocity.direction - (player.direction) + rotate );
-        if ( DR < 2 || DL < 2) {
-            if (Math.abs(player.inertia.rotation) < 2) {
-                player.direction = player.velocity.direction - rotate ;
-                player.inertia.rotation = 0;
-            }
+    var DR = lockDegrees(player.direction - (player.velocity.direction) + rotate );
+    var DL = lockDegrees(player.velocity.direction - (player.direction) + rotate );
+    var V = player.inertia.rotation; // R: (-), L: (+) 
+    var aV = Math.abs(V);
+    if ( DR < 1 || DL < 1) {
+        if (aV < 1) {
+            player.direction = player.velocity.direction - rotate ;
+            player.inertia.rotation = 0;
+        } 
+    } else if (aV > 4) {
+        if (V > 0) {
+            playerYawRight();
         } else {
-            var V = player.inertia.rotation; // R: (-), L: (+) 
-            if (V != 0) {
-                var TL = DL/V;
-                var TR = DR/V;
-            } else {
-                var TL = DL;
-                var TR = DR;
-            }
-
-            if (TL < 0) {
-                TL = Math.abs(TL) * (1 + Math.abs(V)) / player.acceleration.rotation;
-            }
-            if (TR < 0) {
-                TR = Math.abs(TR) * (1 + Math.abs(V)) / player.acceleration.rotation;
-            }
-            var Mid = .05;
-            if (TL < TR) {
-                // Rotate left
-                var R = V/DL;
-                if ( R < Mid)
-                {
-                    playerYawLeft();
-                } else {
-                    playerYawRight();
-                }
-            } else {
-                // Rotate right
-                var R = V/DR;
-                //console.log('Right: ' + String(R));
-                if ( R < Mid) {
-                    playerYawRight();
-                } else {
-                    playerYawLeft();
-                }
-            }
+            playerYawLeft();
         }
     } else {
-        if (player.inertia.rotation != 0) {
-            if (Math.abs(player.inertia.rotation) < player.acceleration.rotation) {
-                player.inertia.rotation = 0;
-            } else if (player.inertia.rotation > 0) {
-                player.inertia.rotation -= player.acceleration.rotation;
-            } else if (player.inertia.rotation < 0) {
-                player.inertia.rotation += player.acceleration.rotation;
+        if (V != 0) {
+            var TL = DL/V;
+            var TR = DR/V;
+        } else {
+            var TL = DL;
+            var TR = DR;
+        }
+
+        if (TL < 0) {
+            TL = Math.abs(TL) * (1 + Math.abs(V)) / player.acceleration.rotation;
+        }
+        if (TR < 0) {
+            TR = Math.abs(TR) * (1 + Math.abs(V)) / player.acceleration.rotation;
+        }
+        var Mid = .05;
+        if (TL < TR) {
+            // Rotate left
+            var R = (V*V)/(DL);
+            if ( R < Mid)
+            {
+                playerYawLeft();
+            } else {
+                playerYawRight();
+            }
+        } else {
+            // Rotate right
+            var R = (V*V)/(DR);
+            //console.log('Right: ' + String(R));
+            if ( R < Mid) {
+                playerYawRight();
+            } else {
+                playerYawLeft();
             }
         }
     }
@@ -381,54 +384,3 @@ function playerLimitSpeed () {
         }
     }
 }
-
-
-
-/*if (key.calibrate.forward) {
-            if (player.velocity.magnitude > 0) {
-                var DR = lockDegrees(player.direction - player.velocity.direction);
-                var DL = lockDegrees(player.velocity.direction - player.direction);
-                if ( DR < 2 || DL < 2) {
-                    if (Math.abs(player.inertia.rotation) < .2) {
-                        player.direction = player.velocity.direction;
-                        player.inertia.rotation = 0;
-                    }
-                } else {
-                    var V = player.inertia.rotation; // R: (-), L: (+) 
-                    if (V != 0) {
-                        var TL = DL/V;
-                        var TR = DR/V;
-                    } else {
-                        var TL = DL;
-                        var TR = DR;
-                    }
-
-                    if (TL < 0) {
-                        TL = Math.abs(TL) * (1 + Math.abs(V)) / player.acceleration.rotation;
-                    }
-                    if (TR < 0) {
-                        TR = Math.abs(TR) * (1 + Math.abs(V)) / player.acceleration.rotation;
-                    }
-                    var Mid = .05;
-                    if (TL < TR) {
-                        // Rotate left
-                        var R = V/DL;
-                        if ( R < Mid)
-                        {
-                            playerYawLeft();
-                        } else {
-                            playerYawRight();
-                        }
-                    } else if (TR < TL){
-                        // Rotate right
-                        var R = V/DR;
-                        //console.log('Right: ' + String(R));
-                        if ( R < Mid) {
-                            playerYawRight();
-                        } else {
-                            playerYawLeft();
-                        }
-                    }
-                }
-            }
-        }*/

@@ -10,7 +10,7 @@ scene.add( background );
 var textureFlare = new THREE.TextureLoader().load( "http://slim/img/lensflare.png" );
 var flareColor = new THREE.Color( 0xffffff );
 var position = new THREE.Vector3(0,0,0);
-var star = addLensFlare( textureFlare, flareColor, position, 2, false);
+var star = addLensFlare( textureFlare, flareColor, position, 1.5, false);
 scene.add( star );
 
 var geometry = new THREE.SphereGeometry( 1 );
