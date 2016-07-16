@@ -12,24 +12,24 @@ var player = {
     direction: 0,
     acceleration: {
         thrust: 1.5,
-        strafe: .8,
+        strafe: 1,
         break: 1,
-        rotation: 0.14
+        rotation: 0.11
     },
     max: {
         speed: 200,
-        rotation: 8
+        rotation: 6
     },
     passive_deceleration: {
         break: 0.1,
-        rotation: 0.01
+        rotation: 0.05
     },
     weapon: {
         blaster: {
-            firerate: 0.05,
+            firerate: .28,
             recoil: 1.8,
-            overheat: 0.01,
-            cooldown: 0.995
+            overheat: 0,
+            cooldown: 0
         }
     }
 }
@@ -41,6 +41,8 @@ var view = {
 
 fireTimer = new THREE.Clock( true );
 firerate = player.weapon.blaster.firerate;
+
+createRock(4,0,.01,.03, 6);
 
 // Rendering the scene
 function render() {
@@ -54,13 +56,22 @@ function render() {
         player.inertia.y = 0;
     }
 
-    // Update rock
-    rock.rotation.z += 0.1;
-    rock.position.x += 0.2;
-    rock.position.y -= 0.05;
-
-    // Projectile step
+    // Collision: Rock/Projectile
+    rocks.forEach( function( rock, index ) {
+        projectiles.forEach( function( projectile, index ) {
+            if ( projectileRockCollision( projectile, rock )) {
+                projectile.alive = false;
+                if ( rock.time > 20) {
+                    rock.health--;
+                }
+            }
+        });
+    });
+    // Update: Projectile
     projectileUpdate();
+
+    // Update: Rock
+    rockUpdate();
 
     // Fire bullet
     if (key.fire) {
@@ -122,7 +133,6 @@ function render() {
             }
         }
     }
-    console.log(player.inertia.x);
     
     // Update position
     spaceship.position.x += player.inertia.x / 400;
@@ -131,34 +141,84 @@ function render() {
 
     // Lock: position
     limitToView ( spaceship );
-    limitToView ( rock );
 
     renderer.render( scene, camera );
 }
 render();
 
+function rockUpdate() {
+    var kill = [];
+    var tmp = [];
+    rocks.forEach( function( rock, index ) {
+        // Update position
+        rock.time++;
+        rock.position.x += rock.inertia.x;
+        rock.position.y += rock.inertia.y;
+
+        limitToView ( rock );
+
+        if ( rock.health <= 0 ) {
+            kill.push( rock );
+            killRock( rock );
+        } else {
+            tmp.push( rock );
+        }
+    });
+    rocks = tmp;
+    kill.forEach( function( rock, index ) {
+        if ( rock.type >= 2 ) {
+            var inertia = rockInertia();
+            createRock( rock.position.x, rock.position.y, rock.inertia.x + inertia[0].x, rock.inertia.y + inertia[0].y, rock.type - 1 );
+            createRock( rock.position.x, rock.position.y, rock.inertia.x + inertia[1].x, rock.inertia.y + inertia[1].y, rock.type - 1 );
+            if (rock.type == 2) {
+                if (myRand( 1, 2 ) == 2) {
+                    createRock( rock.position.x, rock.position.y, rock.inertia.x + inertia[2].x, rock.inertia.y + inertia[2].y, rock.type - 1 );
+                }
+            }
+        }
+    });
+}
+function myRand( min, max ) {
+    return Math.floor(Math.random()*(max-min+1)+min); 
+}
+function rockInertia() {
+    function rockInertiaRand() {
+        return .008 * myRand( -10, 10);
+    };
+    return [
+        {
+            x: rockInertiaRand(),
+            y: rockInertiaRand()
+        },
+        {
+            x: rockInertiaRand(),
+            y: rockInertiaRand()
+        },
+        {
+            x: rockInertiaRand(),
+            y: rockInertiaRand()
+        }]
+}
 function projectileUpdate() {
     var tmp = [];
-    projectiles.forEach(function(projectile, index) {
+    projectiles.forEach( function( projectile, index ) {
         // Update position
         projectile.position.x += projectile.inertia.x;
         projectile.position.y += projectile.inertia.y;
         projectile.translateY(.6);
         projectile.timer --;
         
-        if (sphereCollision( projectile, rock )) {
-            projectile.alive = false;
-        } else if ( outsideView( projectile ) ) {
-            projectile.alive = false;
-        } else if (projectile.timer <= 0) {
-            projectile.alive = false;
-        }
+        if ( outsideView( projectile ) ) {
+                projectile.alive = false;
+            } else if (projectile.timer <= 0) {
+                projectile.alive = false;
+            }
 
         if (projectile.alive) {
             tmp.push( projectile );
         } else {
             // Kill projectile
-            killProjectile( projectile );
+            killObject( projectile );
         }
     });
     projectiles = tmp;
@@ -204,18 +264,22 @@ function playerYawRight( acceleration = player.acceleration.rotation ) {
     player.inertia.rotation -= acceleration;
 }
 function playerStrafeLeft() {
+    soundThrust.play();
     player.inertia.x += Math.cos(toRadians(player.direction+90)) * player.acceleration.strafe;
     player.inertia.y += Math.sin(toRadians(player.direction+90)) * player.acceleration.strafe;
 }
 function playerStrafeRight() {
+    soundThrust.play();
     player.inertia.x += Math.cos(toRadians(player.direction-90)) * player.acceleration.strafe;
     player.inertia.y += Math.sin(toRadians(player.direction-90)) * player.acceleration.strafe;
 }
 function playerThrust() {
+    soundThrust.play();
     player.inertia.x += Math.cos(toRadians(player.direction)) * player.acceleration.thrust;
     player.inertia.y += Math.sin(toRadians(player.direction)) * player.acceleration.thrust;
 }
 function playerBreak() {
+    soundThrust.play();
     player.inertia.x -= Math.cos(toRadians(player.direction)) * player.acceleration.break;
     player.inertia.y -= Math.sin(toRadians(player.direction)) * player.acceleration.break;
 }
@@ -255,8 +319,7 @@ function playerEqualize(rotate = 0) {
         if (TL < TR) {
             // Rotate left
             var R = (V*V)/(DL);
-            if ( R < Mid)
-            {
+            if ( R < Mid) {
                 playerYawLeft();
             } else {
                 playerYawRight();
@@ -264,7 +327,6 @@ function playerEqualize(rotate = 0) {
         } else {
             // Rotate right
             var R = (V*V)/(DR);
-            //console.log('Right: ' + String(R));
             if ( R < Mid) {
                 playerYawRight();
             } else {
@@ -322,8 +384,42 @@ function sphereCollision (a, b) {
     return true;
 }
 
-function killProjectile ( projectile ) {
-    scene.remove( projectile );
+function projectileRockCollision (projectile, rock) {
+    if (projectile.position.x > (rock.position.x + rock_radius[rock.type-1])) {
+        return false;
+    }
+    if (projectile.position.x < (rock.position.x - rock_radius[rock.type-1])) {
+        return false;
+    }
+    if (projectile.position.y > (rock.position.y + rock_radius[rock.type-1])) {
+        return false;
+    }
+    if (projectile.position.y < (rock.position.y - rock_radius[rock.type-1])) {
+        return false;
+    }
+    return true;
+}
+
+function killObject ( object ) {
+    scene.remove( object );
+}
+
+function killRock ( rock ) {
+    switch( rock.type ) {
+        case 1:
+        case 2:
+            soundBangSmall.play();
+            break;
+        case 3:
+        case 4:
+            soundBangMedium.play();
+            break;
+        case 5:
+        case 6:
+            soundBangLarge.play();
+            break;
+    }
+    killObject( rock );
 }
 
 function toRadians (angle) {
@@ -360,7 +456,7 @@ function passiveDeceleration () {
 function activeDeceleration () {
     // Decelerate rotation
     if (player.inertia.rotation != 0) {
-        if (Math.abs(player.inertia.rotation) < player.acceleration.rotation) {
+        if (Math.abs(player.inertia.rotation) <= player.acceleration.rotation) {
             player.inertia.rotation = 0;
         } else if (player.inertia.rotation > 0) {
             player.inertia.rotation -= player.acceleration.rotation;
@@ -370,7 +466,8 @@ function activeDeceleration () {
     }
     
     // Fix inertia
-    if (player.velocity.magnitude > 0) {
+    if (player.velocity.magnitude > 1) {
+        soundThrust.play();
         player.inertia.x -= Math.cos(toRadians(player.velocity.direction)) * player.acceleration.break;
         player.inertia.y -= Math.sin(toRadians(player.velocity.direction)) * player.acceleration.break;
     }

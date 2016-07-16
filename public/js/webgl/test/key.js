@@ -49,7 +49,7 @@ Mousetrap.bind(keys, function() {
 }, 'keyup');
 
 // Stall
-keys = 'q';
+keys = 'a';
 Mousetrap.bind(keys, function() {
     key.stall = true;
     return false;
@@ -82,7 +82,7 @@ Mousetrap.bind(keys, function() {
 }, 'keyup');
 
 // Strafe left
-keys = 'a';
+keys = 's';
 Mousetrap.bind(keys, function() {
     key.strafe.left = true;
     return false;
@@ -93,7 +93,7 @@ Mousetrap.bind(keys, function() {
 }, 'keyup');
 
 // Strafe right
-keys = 'd';
+keys = 'f';
 Mousetrap.bind(keys, function() {
     key.strafe.right = true;
     return false;
@@ -104,7 +104,7 @@ Mousetrap.bind(keys, function() {
 }, 'keyup');
 
 // Calibrate forward
-keys = 'w';
+keys = 'e';
 Mousetrap.bind(keys, function() {
     key.calibrate.forward = true;
     return false;
@@ -115,7 +115,7 @@ Mousetrap.bind(keys, function() {
 }, 'keyup');
 
 // Calibrate backward
-keys = 's';
+keys = 'd';
 Mousetrap.bind(keys, function() {
     key.calibrate.backward = true;
     return false;
