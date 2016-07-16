@@ -49,7 +49,7 @@ Mousetrap.bind(keys, function() {
 }, 'keyup');
 
 // Stall
-keys = 'a';
+keys = 'w';
 Mousetrap.bind(keys, function() {
     key.stall = true;
     return false;
@@ -60,7 +60,7 @@ Mousetrap.bind(keys, function() {
 }, 'keyup');
 
 // Yaw Left
-keys = ['j', 'left', '4'];
+keys = 's';
 Mousetrap.bind(keys, function() {
     key.yaw.left = true;
     return false;
@@ -71,7 +71,7 @@ Mousetrap.bind(keys, function() {
 }, 'keyup');
 
 // Yaw right
-keys = ['l', 'right', '6'];
+keys = 'f';
 Mousetrap.bind(keys, function() {
     key.yaw.right = true;
     return false;
@@ -82,7 +82,7 @@ Mousetrap.bind(keys, function() {
 }, 'keyup');
 
 // Strafe left
-keys = 's';
+keys = ['j', 'left', '4'];
 Mousetrap.bind(keys, function() {
     key.strafe.left = true;
     return false;
@@ -93,7 +93,7 @@ Mousetrap.bind(keys, function() {
 }, 'keyup');
 
 // Strafe right
-keys = 'f';
+keys = ['l', 'right', '6'];
 Mousetrap.bind(keys, function() {
     key.strafe.right = true;
     return false;

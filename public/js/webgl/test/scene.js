@@ -82,9 +82,8 @@ function createRock ( origin_x, origin_y, inertia_x, inertia_y, type) {
 var projectile_geometry = new THREE.PlaneGeometry( .2, 1.2, 1 );
 var projectile_material = new THREE.MeshBasicMaterial( { color: 0xdd0000 } );
 var projectiles = [];
-
 function fire ( origin_x, origin_y, inertia_x, inertia_y, rotation_z ) {
-    soundFire.play();
+    soundPlay('Blaster');
     var projectile = new THREE.Mesh( projectile_geometry, projectile_material );
     projectile.position.x = origin_x;
     projectile.position.y = origin_y;
@@ -140,120 +139,7 @@ function addLensFlare( textureFlare, flareColor, position, size, overrideImage){
   return lensFlare;
 }
 
-// Audio
-// instantiate a listener
-var audioListener = new THREE.AudioListener();
 
-// add the listener to the camera
-camera.add( audioListener );
-
-// instantiate audio object
-var soundFire = new THREE.Audio( audioListener );
-var soundThrust = new THREE.Audio( audioListener );
-var soundBangSmall = new THREE.Audio( audioListener );
-var soundBangMedium = new THREE.Audio( audioListener );
-var soundBangLarge = new THREE.Audio( audioListener );
-
-// add the audio object to the scene
-scene.add( soundFire );
-
-// instantiate a loader
-var audioLoader = new THREE.AudioLoader();
-
-// load a resource
-// Load Fire
-audioLoader.load(
-  // resource URL
-  'http://slim/sound/asteroid/fire.wav',
-  // Function when resource is loaded
-  function ( audioBuffer ) {
-    // set the audio object buffer to the loaded object
-    soundFire.setBuffer( audioBuffer );
-  },
-  // Function called when download progresses
-  function ( xhr ) {
-    console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-  },
-  // Function called when download errors
-  function ( xhr ) {
-    console.log( 'An error happened' );
-  }
-);
-// Load Thrust
-audioLoader.load(
-  // resource URL
-  'http://slim/sound/asteroid/thrust.wav',
-  // Function when resource is loaded
-  function ( audioBuffer ) {
-    // set the audio object buffer to the loaded object
-    soundThrust.setBuffer( audioBuffer );
-  },
-  // Function called when download progresses
-  function ( xhr ) {
-    console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-  },
-  // Function called when download errors
-  function ( xhr ) {
-    console.log( 'An error happened' );
-  }
-);
-
-// Load Bang small
-audioLoader.load(
-  // resource URL
-  'http://slim/sound/asteroid/bangSmall.wav',
-  // Function when resource is loaded
-  function ( audioBuffer ) {
-    // set the audio object buffer to the loaded object
-    soundBangSmall.setBuffer( audioBuffer );
-  },
-  // Function called when download progresses
-  function ( xhr ) {
-    console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-  },
-  // Function called when download errors
-  function ( xhr ) {
-    console.log( 'An error happened' );
-  }
-);
-
-// Load Bang medium
-audioLoader.load(
-  // resource URL
-  'http://slim/sound/asteroid/bangMedium.wav',
-  // Function when resource is loaded
-  function ( audioBuffer ) {
-    // set the audio object buffer to the loaded object
-    soundBangMedium.setBuffer( audioBuffer );
-  },
-  // Function called when download progresses
-  function ( xhr ) {
-    console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-  },
-  // Function called when download errors
-  function ( xhr ) {
-    console.log( 'An error happened' );
-  }
-);
-
-// Load Bang large
-audioLoader.load(
-  // resource URL
-  'http://slim/sound/asteroid/bangLarge.wav',
-  // Function when resource is loaded
-  function ( audioBuffer ) {
-    // set the audio object buffer to the loaded object
-    soundBangLarge.setBuffer( audioBuffer );
-  },
-  // Function called when download progresses
-  function ( xhr ) {
-    console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-  },
-  // Function called when download errors
-  function ( xhr ) {
-    console.log( 'An error happened' );
-  }
-);
 
 
 
@@ -294,3 +180,21 @@ function createRock ( origin_x, origin_y, inertia_x, inertia_y, type) {
    rocks.push( rock );
    scene.add( rock );
 }**/
+
+// Load sounds
+function loadSound () {
+  createjs.Sound.registerSound('http://slim/sound/jonas/fire.wav', 'Blaster');
+  createjs.Sound.registerSound('http://slim/sound/asteroid/thrust.wav', 'Thrust');
+  createjs.Sound.registerSound('http://slim/sound/asteroid/bangSmall.wav', 'BangSm');
+  createjs.Sound.registerSound('http://slim/sound/asteroid/bangMedium.wav', 'BangMd');
+  createjs.Sound.registerSound('http://slim/sound/asteroid/bangLarge.wav', 'BangLg');
+  createjs.Sound.registerSound('http://slim/sound/jonas/hit1.wav', 'Hit1');
+  createjs.Sound.registerSound('http://slim/sound/jonas/hit2.wav', 'Hit2');
+  createjs.Sound.registerSound('http://slim/sound/jonas/hit3.wav', 'Hit3');
+  createjs.Sound.registerSound('http://slim/sound/jonas/hit4.wav', 'Hit4');
+  createjs.Sound.registerSound('http://slim/sound/jonas/hit5.wav', 'Hit5');
+  createjs.Sound.registerSound('http://slim/sound/jonas/hit6.wav', 'Hit6');
+}
+function soundPlay (sound) {
+  createjs.Sound.play( sound );
+}

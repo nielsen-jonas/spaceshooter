@@ -12,21 +12,21 @@ var player = {
     direction: 0,
     acceleration: {
         thrust: 1.5,
-        strafe: 1,
+        strafe: 1.25,
         break: 1,
-        rotation: 0.11
+        rotation: 0.1
     },
     max: {
         speed: 200,
-        rotation: 6
+        rotation: 3
     },
     passive_deceleration: {
         break: 0.1,
-        rotation: 0.05
+        rotation: 0.06
     },
     weapon: {
         blaster: {
-            firerate: .28,
+            firerate: .2,
             recoil: 1.8,
             overheat: 0,
             cooldown: 0
@@ -67,6 +67,27 @@ function render() {
             }
         });
     });
+
+    rocks.forEach( function( rock, index ) {
+        // Collision: Rock/Projectile
+        projectiles.forEach( function( projectile, index ) {
+            if ( projectileRockCollision( projectile, rock )) {
+                projectile.alive = false;
+                if ( rock.time > 20) {
+                    rock.health--;
+                }
+            }
+        });
+        // Collision: Rock/Player
+        if (projectileRockCollision( spaceship, rock )) {
+             spaceship.position.x = 0;
+             spaceship.position.y = 0;
+             player.inertia.x = 0;
+             player.inertia.y = 0;
+             player.direction = 0;
+        }
+    });
+
     // Update: Projectile
     projectileUpdate();
 
@@ -170,11 +191,6 @@ function rockUpdate() {
             var inertia = rockInertia();
             createRock( rock.position.x, rock.position.y, rock.inertia.x + inertia[0].x, rock.inertia.y + inertia[0].y, rock.type - 1 );
             createRock( rock.position.x, rock.position.y, rock.inertia.x + inertia[1].x, rock.inertia.y + inertia[1].y, rock.type - 1 );
-            if (rock.type == 2) {
-                if (myRand( 1, 2 ) == 2) {
-                    createRock( rock.position.x, rock.position.y, rock.inertia.x + inertia[2].x, rock.inertia.y + inertia[2].y, rock.type - 1 );
-                }
-            }
         }
     });
 }
@@ -264,22 +280,22 @@ function playerYawRight( acceleration = player.acceleration.rotation ) {
     player.inertia.rotation -= acceleration;
 }
 function playerStrafeLeft() {
-    soundThrust.play();
+    soundPlay( 'Thrust' );
     player.inertia.x += Math.cos(toRadians(player.direction+90)) * player.acceleration.strafe;
     player.inertia.y += Math.sin(toRadians(player.direction+90)) * player.acceleration.strafe;
 }
 function playerStrafeRight() {
-    soundThrust.play();
+    soundPlay( 'Thrust' );
     player.inertia.x += Math.cos(toRadians(player.direction-90)) * player.acceleration.strafe;
     player.inertia.y += Math.sin(toRadians(player.direction-90)) * player.acceleration.strafe;
 }
 function playerThrust() {
-    soundThrust.play();
+    soundPlay( 'Thrust' );
     player.inertia.x += Math.cos(toRadians(player.direction)) * player.acceleration.thrust;
     player.inertia.y += Math.sin(toRadians(player.direction)) * player.acceleration.thrust;
 }
 function playerBreak() {
-    soundThrust.play();
+    soundPlay( 'Thrust' );
     player.inertia.x -= Math.cos(toRadians(player.direction)) * player.acceleration.break;
     player.inertia.y -= Math.sin(toRadians(player.direction)) * player.acceleration.break;
 }
@@ -320,17 +336,17 @@ function playerEqualize(rotate = 0) {
             // Rotate left
             var R = (V*V)/(DL);
             if ( R < Mid) {
-                playerYawLeft();
+                playerYawLeft( player.acceleration.rotation * 2 );
             } else {
-                playerYawRight();
+                playerYawRight( player.acceleration.rotation );
             }
         } else {
             // Rotate right
             var R = (V*V)/(DR);
             if ( R < Mid) {
-                playerYawRight();
+                playerYawRight( player.acceleration.rotation * 2 );
             } else {
-                playerYawLeft();
+                playerYawLeft( player.acceleration.rotation );
             }
         }
     }
@@ -408,15 +424,15 @@ function killRock ( rock ) {
     switch( rock.type ) {
         case 1:
         case 2:
-            soundBangSmall.play();
+            soundPlay( 'BangSm' );
             break;
         case 3:
         case 4:
-            soundBangMedium.play();
+            soundPlay( 'BangMd' );
             break;
         case 5:
         case 6:
-            soundBangLarge.play();
+            soundPlay( 'BangLg' );
             break;
     }
     killObject( rock );
@@ -467,7 +483,7 @@ function activeDeceleration () {
     
     // Fix inertia
     if (player.velocity.magnitude > 1) {
-        soundThrust.play();
+        soundPlay( 'Thrust' );
         player.inertia.x -= Math.cos(toRadians(player.velocity.direction)) * player.acceleration.break;
         player.inertia.y -= Math.sin(toRadians(player.velocity.direction)) * player.acceleration.break;
     }

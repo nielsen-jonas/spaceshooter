@@ -10,7 +10,7 @@
             {% endblock %}
         {% endblock %}
     </head>
-    <body>
+    <body onload="{% block onload %}{% endblock %}">
         {% block body %}
             {% block content %}
             {% endblock %}
