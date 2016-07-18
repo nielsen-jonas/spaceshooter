@@ -13,7 +13,7 @@ var player = {
     acceleration: {
         thrust: 1.5,
         strafe: 1.25,
-        break: 1,
+        break: 2,
         rotation: 0.1
     },
     max: {
@@ -26,7 +26,7 @@ var player = {
     },
     weapon: {
         blaster: {
-            firerate: .2,
+            firerate: .18,
             recoil: 1.8,
             overheat: 0,
             cooldown: 0
@@ -35,8 +35,8 @@ var player = {
 }
 
 var view = {
-    width: 42.87,
-    height: 24
+    width: 54,
+    height: 30.23
 }
 
 fireTimer = new THREE.Clock( true );
@@ -126,11 +126,10 @@ function render() {
     playerLimitSpeed();
 
     // Controls
+    passiveDeceleration();
     if (key.stall) {
         activeDeceleration();
     } else {
-        passiveDeceleration();
-
         if (key.thrust) {
             playerThrust();
         } else if (key.break) {
@@ -209,7 +208,7 @@ function myRand( min, max ) {
 }
 function rockInertia() {
     function rockInertiaRand() {
-        return .008 * myRand( -10, 10);
+        return .018 * myRand( -10, 10);
     };
     return [
         {
@@ -231,7 +230,7 @@ function projectileUpdate() {
         // Update position
         projectile.position.x += projectile.inertia.x;
         projectile.position.y += projectile.inertia.y;
-        projectile.translateY(.6);
+        projectile.translateY(.8);
         projectile.timer --;
         
         limitToView( projectile );

@@ -16,6 +16,7 @@ var config = {
 
 // Setup
 var scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x000000, 0.015, 100);
 
 var camera = new THREE.PerspectiveCamera (
     config.camera.fov,
@@ -24,7 +25,8 @@ var camera = new THREE.PerspectiveCamera (
     config.camera.clippingPlane.far
 );
 
-camera.position.z = 16;
+//camera.position.z = 16;
+camera.position.z = 20;
 
 var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 renderer.setSize (

@@ -2,7 +2,8 @@
 var geometry = new THREE.PlaneGeometry( 960, 540);
 var texture = new THREE.TextureLoader().load('http://slim/img/game_bg_a.png')
 var material = new THREE.MeshBasicMaterial({
-    map: texture
+    map: texture,
+    fog: false
 });
 var background = new THREE.Mesh( geometry, material );
 scene.add( background );
@@ -39,7 +40,7 @@ function rockRadius ( volume ) {
     return Math.pow((volume/Math.PI)*(3/4), 1/3);
 }
 
-var rock_health = [1, 2, 3, 4, 5, 6];
+var rock_health = [1, 1, 1, 1, 1, 1];
 var rock_radius = [
   rockRadius( 1 ),
   rockRadius( 3 ),
@@ -101,9 +102,9 @@ function fire ( origin_x, origin_y, inertia_x, inertia_y, rotation_z ) {
 
 // Positioning
 background.position.z = -330;
-star.position.z = -200;
-star.position.x = -190;
-star.position.y = 72;
+star.position.z = -329;
+star.position.x = -302;
+star.position.y = 115;
 
 
 
@@ -201,11 +202,11 @@ function soundPlay (sound) {
 
 // Particle explosion effect
 //////////////settings/////////
-var movementSpeed = .6;
+var movementSpeed = .8;
 var totalObjects = 1000;
-var objectSize = .1;
-var sizeRandomness = 5000;
-var colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
+var objectSize = .06;
+var sizeRandomness = 10000;
+//var colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
 /////////////////////////////////
 var dirs = [];
 var parts = [];
@@ -225,9 +226,10 @@ function ExplodeAnimation(x,y)
     dirs.push({x:(Math.random() * movementSpeed)-(movementSpeed/2),y:(Math.random() * movementSpeed)-(movementSpeed/2),z:(Math.random() * movementSpeed)-(movementSpeed/2)});
   }
 
-  var material = new THREE.PointsMaterial( { size: objectSize,  color: colors[Math.round(Math.random() * colors.length)] });
+  //var material = new THREE.PointsMaterial( { size: objectSize,  color: colors[Math.round(Math.random() * colors.length)] });
+  var material = new THREE.PointsMaterial( { size: objectSize,  color: 0xBBBBBB });
   var particles = new THREE.Points( geometry, material );
-  
+  this.lifetime = 2000;
   this.object = particles;
   this.status = true;
   
@@ -238,6 +240,10 @@ function ExplodeAnimation(x,y)
   scene.add( this.object  ); 
   
   this.update = function(){
+    this.lifetime --;
+    if ( this.lifetime <= 0 ) {
+        scene.remove(this.object);
+    }
     if (this.status == true){
       var pCount = totalObjects;
       while(pCount--) {
