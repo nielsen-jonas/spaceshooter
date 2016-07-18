@@ -15,8 +15,20 @@ var key = {
     calibrate: {
         forward: false,
         backward: false
-    }
+    },
+    test: false
 }
+
+// Test
+keys = 't';
+Mousetrap.bind(keys, function() {
+    key.test = true;
+    return false;
+}, 'keydown');
+Mousetrap.bind(keys, function() {
+    key.test = false;
+    return false;
+}, 'keyup');
 
 // Pause
 Mousetrap.bind(['p', 'enter'], function() {

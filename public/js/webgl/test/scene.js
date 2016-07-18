@@ -39,7 +39,7 @@ function rockRadius ( volume ) {
     return Math.pow((volume/Math.PI)*(3/4), 1/3);
 }
 
-var rock_health = [1, 1, 2, 2, 3, 3];
+var rock_health = [1, 2, 3, 4, 5, 6];
 var rock_radius = [
   rockRadius( 1 ),
   rockRadius( 3 ),
@@ -89,7 +89,7 @@ function fire ( origin_x, origin_y, inertia_x, inertia_y, rotation_z ) {
     projectile.position.y = origin_y;
     projectile.rotation.z = rotation_z;
     projectile.inertia = {};
-    projectile.timer = 2000;
+    projectile.timer = 32;
     projectile.inertia.x = inertia_x / 380;
     projectile.inertia.y = inertia_y / 380;
     projectile.alive = true;
@@ -185,9 +185,9 @@ function createRock ( origin_x, origin_y, inertia_x, inertia_y, type) {
 function loadSound () {
   createjs.Sound.registerSound('http://slim/sound/jonas/fire.wav', 'Blaster');
   createjs.Sound.registerSound('http://slim/sound/asteroid/thrust.wav', 'Thrust');
-  createjs.Sound.registerSound('http://slim/sound/asteroid/bangSmall.wav', 'BangSm');
-  createjs.Sound.registerSound('http://slim/sound/asteroid/bangMedium.wav', 'BangMd');
-  createjs.Sound.registerSound('http://slim/sound/asteroid/bangLarge.wav', 'BangLg');
+  createjs.Sound.registerSound('http://slim/sound/jonas/rock1_exp.wav', 'BangSm');
+  createjs.Sound.registerSound('http://slim/sound/jonas/rock2_exp.wav', 'BangMd');
+  createjs.Sound.registerSound('http://slim/sound/jonas/rock3_exp.wav', 'BangLg');
   createjs.Sound.registerSound('http://slim/sound/jonas/hit1.wav', 'Hit1');
   createjs.Sound.registerSound('http://slim/sound/jonas/hit2.wav', 'Hit2');
   createjs.Sound.registerSound('http://slim/sound/jonas/hit3.wav', 'Hit3');
@@ -197,4 +197,57 @@ function loadSound () {
 }
 function soundPlay (sound) {
   createjs.Sound.play( sound );
+}
+
+// Particle explosion effect
+//////////////settings/////////
+var movementSpeed = .6;
+var totalObjects = 1000;
+var objectSize = .1;
+var sizeRandomness = 5000;
+var colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
+/////////////////////////////////
+var dirs = [];
+var parts = [];
+
+function ExplodeAnimation(x,y)
+{
+  var geometry = new THREE.Geometry();
+  
+  for (i = 0; i < totalObjects; i ++) 
+  { 
+    var vertex = new THREE.Vector3();
+    vertex.x = x;
+    vertex.y = y;
+    vertex.z = 0;
+  
+    geometry.vertices.push( vertex );
+    dirs.push({x:(Math.random() * movementSpeed)-(movementSpeed/2),y:(Math.random() * movementSpeed)-(movementSpeed/2),z:(Math.random() * movementSpeed)-(movementSpeed/2)});
+  }
+
+  var material = new THREE.PointsMaterial( { size: objectSize,  color: colors[Math.round(Math.random() * colors.length)] });
+  var particles = new THREE.Points( geometry, material );
+  
+  this.object = particles;
+  this.status = true;
+  
+  this.xDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+  this.yDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+  this.zDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+  
+  scene.add( this.object  ); 
+  
+  this.update = function(){
+    if (this.status == true){
+      var pCount = totalObjects;
+      while(pCount--) {
+        var particle =  this.object.geometry.vertices[pCount]
+        particle.y += dirs[pCount].y;
+        particle.x += dirs[pCount].x;
+        particle.z += dirs[pCount].z;
+      }
+      this.object.geometry.verticesNeedUpdate = true;
+    }
+  }
+  
 }

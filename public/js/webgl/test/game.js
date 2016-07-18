@@ -22,7 +22,7 @@ var player = {
     },
     passive_deceleration: {
         break: 0.1,
-        rotation: 0.06
+        rotation: 0.1
     },
     weapon: {
         blaster: {
@@ -48,6 +48,15 @@ createRock(4,0,.01,.03, 6);
 function render() {
     requestAnimationFrame( render );
     
+    /* PARTICLE EXPERIMENTAL */
+        var pCount = parts.length;
+        while(pCount--) {
+        parts[pCount].update();
+        }
+    /* END PARTICLE EXPERIMENTAL */
+
+
+
     // TODO: Find out why inertia variables arent arent still when not moving
     if (Math.abs(player.inertia.x) < .1) {
         player.inertia.x = 0;
@@ -61,7 +70,7 @@ function render() {
         projectiles.forEach( function( projectile, index ) {
             if ( projectileRockCollision( projectile, rock )) {
                 projectile.alive = false;
-                if ( rock.time > 20) {
+                if ( rock.time > 10) {
                     rock.health--;
                 }
             }
@@ -187,6 +196,7 @@ function rockUpdate() {
     });
     rocks = tmp;
     kill.forEach( function( rock, index ) {
+        parts.push(new ExplodeAnimation(rock.position.x, rock.position.y));
         if ( rock.type >= 2 ) {
             var inertia = rockInertia();
             createRock( rock.position.x, rock.position.y, rock.inertia.x + inertia[0].x, rock.inertia.y + inertia[0].y, rock.type - 1 );
@@ -224,11 +234,11 @@ function projectileUpdate() {
         projectile.translateY(.6);
         projectile.timer --;
         
-        if ( outsideView( projectile ) ) {
-                projectile.alive = false;
-            } else if (projectile.timer <= 0) {
-                projectile.alive = false;
-            }
+        limitToView( projectile );
+
+        if (projectile.timer <= 0) {
+            projectile.alive = false;
+        }
 
         if (projectile.alive) {
             tmp.push( projectile );
@@ -336,7 +346,7 @@ function playerEqualize(rotate = 0) {
             // Rotate left
             var R = (V*V)/(DL);
             if ( R < Mid) {
-                playerYawLeft( player.acceleration.rotation * 2 );
+                playerYawLeft( player.acceleration.rotation * 6 );
             } else {
                 playerYawRight( player.acceleration.rotation );
             }
@@ -344,7 +354,7 @@ function playerEqualize(rotate = 0) {
             // Rotate right
             var R = (V*V)/(DR);
             if ( R < Mid) {
-                playerYawRight( player.acceleration.rotation * 2 );
+                playerYawRight( player.acceleration.rotation * 6 );
             } else {
                 playerYawLeft( player.acceleration.rotation );
             }
