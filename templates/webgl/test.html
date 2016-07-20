@@ -6,36 +6,61 @@
     <style>
         body {
             text-align: center;
+            font-family: 'Oswald';
         }
         #controls {
         	width: 960px;
         	margin: 0 auto;
         	text-align: left;
         }
+        .control {
+            float:left;
+            margin-right: 6rem;
+        }
+        h1 {
+            font-family: 'Bungee';
+            letter-spacing: 1em;
+        }
         
     </style>
 {% endblock %}
+{% block links %}
+    <link href='https://fonts.googleapis.com/css?family=Bungee' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+{% endblock %}
 {% block content %}
-    <h1>WebGL Test</h1>
+    <h1>ASTEROIDS</h1>
     <iframe id="game" src="{{ website.url ~ '/webgl/test/fullscreen' }}" width="960" height="540" scrolling="no"></iframe>
     <section id="controls">
         <h2>Controls</h2>
-        <dl>
-            <dt>Thrust</dt>
-            <dd>I, K</dd>
-            <dt>Strafe</dt>
-            <dd>J, L</dd>
-            <dt>Rotate</dt>
-            <dd>S, F</dd>
-            <dt>Equalize</dt>
-            <dd>E, D</dd>
-            <dt>Stall</dt>
-            <dd>W</dd>
-            <dt>Blaster</dt>
-            <dd>Space</dd>
-            <dt>Pause</dt>
-            <dd>P</dd>
-        </dl>
+        <div>
+            <div class="control">
+                <h3>Primary</h3>
+                <dl>
+                    <dt>Thrust</dt>
+                    <dd>Up, Down</dd>
+                    <dt>Rotate</dt>
+                    <dd>S, F</dd>
+                    <dt>Blaster</dt>
+                    <dd>Space</dd>
+                    <dt>Pause</dt>
+                    <dd>P</dd>
+                </dl>
+            </div>
+            <div class="control">
+                <h3>Advanced</h3>
+                <dl>
+                    <dt>Strafe</dt>
+                    <dd>Left, Right</dd>
+                    <dt>Equalize</dt>
+                    <dd>E, D</dd>
+                    <dt>Stall</dt>
+                    <dd>W</dd>
+                    <dt>Hyperspace</dt>
+                    <dd>Enter</dd>
+                </dl>
+            </div>
+        <div>
     </section>
 {% endblock %}
 {% block scripts %}

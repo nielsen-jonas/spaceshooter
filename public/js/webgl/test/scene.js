@@ -24,7 +24,7 @@ scene.add( spaceship );
 
 // Lights
 var ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
-var directionalLight = new THREE.DirectionalLight( 0xffffff, .8 );
+var directionalLight = new THREE.DirectionalLight( 0xffffff, .9 );
 directionalLight.position.set( -80, 40, 60 );
 scene.add( ambientLight );
 scene.add( directionalLight );
@@ -83,11 +83,12 @@ function createRock ( origin_x, origin_y, inertia_x, inertia_y, type) {
 var projectile_geometry = new THREE.PlaneGeometry( .2, 1.2, 1 );
 var projectile_material = new THREE.MeshBasicMaterial( { color: 0xdd0000 } );
 var projectiles = [];
-function fire ( origin_x, origin_y, inertia_x, inertia_y, rotation_z ) {
+function fire ( origin_x, origin_y, origin_z, inertia_x, inertia_y, rotation_z ) {
     soundPlay('Blaster');
     var projectile = new THREE.Mesh( projectile_geometry, projectile_material );
     projectile.position.x = origin_x;
     projectile.position.y = origin_y;
+    projectile.position.z = origin_z;
     projectile.rotation.z = rotation_z;
     projectile.inertia = {};
     projectile.timer = 32;
@@ -183,21 +184,37 @@ function createRock ( origin_x, origin_y, inertia_x, inertia_y, type) {
 }**/
 
 // Load sounds
-function loadSound () {
-  createjs.Sound.registerSound('http://slim/sound/jonas/fire.wav', 'Blaster');
-  createjs.Sound.registerSound('http://slim/sound/asteroid/thrust.wav', 'Thrust');
-  createjs.Sound.registerSound('http://slim/sound/jonas/rock1_exp.wav', 'BangSm');
-  createjs.Sound.registerSound('http://slim/sound/jonas/rock2_exp.wav', 'BangMd');
-  createjs.Sound.registerSound('http://slim/sound/jonas/rock3_exp.wav', 'BangLg');
-  createjs.Sound.registerSound('http://slim/sound/jonas/hit1.wav', 'Hit1');
-  createjs.Sound.registerSound('http://slim/sound/jonas/hit2.wav', 'Hit2');
-  createjs.Sound.registerSound('http://slim/sound/jonas/hit3.wav', 'Hit3');
-  createjs.Sound.registerSound('http://slim/sound/jonas/hit4.wav', 'Hit4');
-  createjs.Sound.registerSound('http://slim/sound/jonas/hit5.wav', 'Hit5');
-  createjs.Sound.registerSound('http://slim/sound/jonas/hit6.wav', 'Hit6');
+var assetPath = 'http://slim/sound/jonas/';
+var sounds = [
+    { src: 'fire.wav', id: 'Blaster'},
+    { src: 'thrust.wav', id: 'Thrust'},
+    { src: 'rock1_exp.wav', id: 'BangSm'},
+    { src: 'rock2_exp.wav', id: 'BangMd'},
+    { src: 'rock3_exp.wav', id: 'BangLg'},
+    { src: 'hit1.wav', id: 'Hit1'},
+    { src: 'hit2.wav', id: 'Hit2'},
+    { src: 'hit3.wav', id: 'Hit3'},
+    { src: 'hit4.wav', id: 'Hit4'},
+    { src: 'hit5.wav', id: 'Hit5'},
+    { src: 'hit6.wav', id: 'Hit6'},
+
+];
+function loadSounds() {
+  createjs.Sound.registerSounds( sounds, assetPath );
+  myConst.sounds = {};
+  myConst.sounds.thrust = createjs.Sound.play( 'Thrust' );
 }
-function soundPlay (sound) {
-  createjs.Sound.play( sound );
+function soundPlay(sound) {
+    createjs.Sound.play( sound );
+}
+function soundStop( sound ) {
+  createjs.Sound.stop( sound );
+}
+function soundRemove( sound ) {
+  createjs.Sound.removeSound( sound );
+} 
+function soundRemoveAll() {
+    createjs.Sound.removeAllSounds();
 }
 
 // Particle explosion effect

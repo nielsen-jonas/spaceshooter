@@ -16,8 +16,10 @@ var key = {
         forward: false,
         backward: false
     },
+    hyperspace: false,
     test: false
 }
+var keys;
 
 // Test
 keys = 't';
@@ -31,12 +33,16 @@ Mousetrap.bind(keys, function() {
 }, 'keyup');
 
 // Pause
-Mousetrap.bind(['p', 'enter'], function() {
+Mousetrap.bind('p', function() {
     alert('P A U S E');
     return false;
 }, 'keydown')
 
-var keys;
+// Hyperspace
+Mousetrap.bind('enter', function() {
+    key.hyperspace = true;
+    return false;
+}, 'keydown');
 
 // Thrust
 keys = ['up', 'i', '8'];

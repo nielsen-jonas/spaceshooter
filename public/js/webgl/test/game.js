@@ -1,5 +1,10 @@
 // Player properties
 var player = {
+    hyperspace: {
+        out: false,
+        in: false,
+        cooldown: 0
+    },
     inertia: {
         x: 0,
         y: 0,
@@ -42,12 +47,18 @@ var view = {
 fireTimer = new THREE.Clock( true );
 firerate = player.weapon.blaster.firerate;
 
-createRock(4,0,.01,.03, 6);
+createRock(8,0,.02,.06, 6);
+createRock(8,8,.02,.06, 6);
+createRock(-10,-4,.04,.08, 5);
 
+preRender();
 // Rendering the scene
 function render() {
     requestAnimationFrame( render );
     
+    // Thrust volume control based on key input
+    soundThrustCtl();
+
     /* PARTICLE EXPERIMENTAL */
         var pCount = parts.length;
         while(pCount--) {
@@ -88,7 +99,7 @@ function render() {
             }
         });
         // Collision: Rock/Player
-        if (projectileRockCollision( spaceship, rock )) {
+        if (spaceshipRockCollision( spaceship, rock )) {
              spaceship.position.x = 0;
              spaceship.position.y = 0;
              player.inertia.x = 0;
@@ -129,38 +140,53 @@ function render() {
     passiveDeceleration();
     if (key.stall) {
         activeDeceleration();
-    } else {
-        if (key.thrust) {
-            playerThrust();
-        } else if (key.break) {
-            playerBreak();
-        }
+    }
 
-        if (key.yaw.left) {
-            if (player.inertia.rotation < player.max.rotation) {
-                playerYawLeft();
-            }
-        }
-        if (key.yaw.right) {
-            if (player.inertia.rotation > -player.max.rotation) {
-                playerYawRight();
-            }
-        }
+    if (key.thrust) {
+        playerThrust();
+    } else if (key.break) {
+        playerBreak();
+    }
 
-        if (key.strafe.left) {
-            playerStrafeLeft();
+    if (key.yaw.left) {
+        if (player.inertia.rotation < player.max.rotation) {
+            playerYawLeft();
         }
-        if (key.strafe.right) {
-            playerStrafeRight();
+    }
+    if (key.yaw.right) {
+        if (player.inertia.rotation > -player.max.rotation) {
+            playerYawRight();
         }
-        
-        if (!key.yaw.left && !key.yaw.right) {
-            if (key.calibrate.forward) {
-                playerEqualize();
-            } else if (key.calibrate.backward){
-                playerEqualize( 180 );
-            }
+    }
+
+    if (key.strafe.left) {
+        playerStrafeLeft();
+    }
+    if (key.strafe.right) {
+        playerStrafeRight();
+    }
+    
+    if (!key.yaw.left && !key.yaw.right) {
+        if (key.calibrate.forward) {
+            playerEqualize();
+        } else if (key.calibrate.backward){
+            playerEqualize( 180 );
         }
+    }
+
+    if ( key.hyperspace ) {
+        key.hyperspace = false;
+        if ( player.hyperspace.cooldown == 0 ) {
+            playerHyperspaceInit();
+        }
+    }
+
+    if ( player.hyperspace.out ) {
+        playerHyperspaceOut();
+    } else if ( player.hyperspace.in ) {
+        playerHyperspaceIn();
+    } else if ( player.hyperspace.cooldown > 0 ) {
+        player.hyperspace.cooldown --;
     }
     
     // Update position
@@ -250,13 +276,15 @@ function projectileUpdate() {
 }
 
 function playerWeaponBlasterFire() {
-    if (fireTimer.getElapsedTime() >= firerate) {
-        firerate += player.weapon.blaster.overheat;
-        fireTimer = new THREE.Clock( true );
-        fire(spaceship.position.x, spaceship.position.y, player.inertia.x, player.inertia.y, spaceship.rotation.z);
-        // recoil
-        player.inertia.x -= Math.cos(toRadians(player.direction)) * player.weapon.blaster.recoil;
-        player.inertia.y -= Math.sin(toRadians(player.direction)) * player.weapon.blaster.recoil;
+    if ( Math.abs( spaceship.position.z ) < 5 ) {
+        if ( fireTimer.getElapsedTime() >= firerate ) {
+            firerate += player.weapon.blaster.overheat;
+            fireTimer = new THREE.Clock( true );
+            fire(spaceship.position.x, spaceship.position.y, spaceship.position.z, player.inertia.x, player.inertia.y, spaceship.rotation.z);
+            // recoil
+            player.inertia.x -= Math.cos(toRadians(player.direction)) * player.weapon.blaster.recoil;
+            player.inertia.y -= Math.sin(toRadians(player.direction)) * player.weapon.blaster.recoil;
+        }
     }
 }
 function playerWeaponBlasterCooldown() {
@@ -289,24 +317,47 @@ function playerYawRight( acceleration = player.acceleration.rotation ) {
     player.inertia.rotation -= acceleration;
 }
 function playerStrafeLeft() {
-    soundPlay( 'Thrust' );
     player.inertia.x += Math.cos(toRadians(player.direction+90)) * player.acceleration.strafe;
     player.inertia.y += Math.sin(toRadians(player.direction+90)) * player.acceleration.strafe;
 }
 function playerStrafeRight() {
-    soundPlay( 'Thrust' );
     player.inertia.x += Math.cos(toRadians(player.direction-90)) * player.acceleration.strafe;
     player.inertia.y += Math.sin(toRadians(player.direction-90)) * player.acceleration.strafe;
 }
 function playerThrust() {
-    soundPlay( 'Thrust' );
     player.inertia.x += Math.cos(toRadians(player.direction)) * player.acceleration.thrust;
     player.inertia.y += Math.sin(toRadians(player.direction)) * player.acceleration.thrust;
 }
 function playerBreak() {
-    soundPlay( 'Thrust' );
     player.inertia.x -= Math.cos(toRadians(player.direction)) * player.acceleration.break;
     player.inertia.y -= Math.sin(toRadians(player.direction)) * player.acceleration.break;
+}
+function playerHyperspaceInit() {
+    player.hyperspace.in = false;
+    player.hyperspace.out = true;
+    player.hyperspace.cooldown = 1;
+    if ( spaceship.position.z > -4 ) {
+        spaceship.position.z = -4;
+    }
+}
+function playerHyperspaceOut() {
+    if ( spaceship.position.z < (-200)) {
+        spaceship.position.z = 50;
+        spaceship.position.x = (0 - (view.width*.8) / 2) + myRand(0, (view.width*.8));
+        spaceship.position.y = (0 - (view.height*.8) / 2) + myRand(0, (view.height*.8));
+        player.hyperspace.out = false;
+        player.hyperspace.in = true;
+    } else {
+        spaceship.position.z *= 1.2;
+    }
+}
+function playerHyperspaceIn() {
+    if ( spaceship.position.z <= 0.01 ) {
+        spaceship.position.z = 0;
+        player.hyperspace.in = false;
+    } else {
+        spaceship.position.z = spaceship.position.z / 1.05;
+    }
 }
 
 function playerEqualize(rotate = 0) {
@@ -424,6 +475,24 @@ function projectileRockCollision (projectile, rock) {
     }
     return true;
 }
+function spaceshipRockCollision (spaceship, rock) {
+    if ( Math.abs(spaceship.position.z) > rock_radius[rock.type-1] ) {
+        return false;
+    }
+    if (spaceship.position.x > (rock.position.x + rock_radius[rock.type-1])) {
+        return false;
+    }
+    if (spaceship.position.x < (rock.position.x - rock_radius[rock.type-1])) {
+        return false;
+    }
+    if (spaceship.position.y > (rock.position.y + rock_radius[rock.type-1])) {
+        return false;
+    }
+    if (spaceship.position.y < (rock.position.y - rock_radius[rock.type-1])) {
+        return false;
+    }
+    return true;
+}
 
 function killObject ( object ) {
     scene.remove( object );
@@ -432,13 +501,12 @@ function killObject ( object ) {
 function killRock ( rock ) {
     switch( rock.type ) {
         case 1:
-        case 2:
             soundPlay( 'BangSm' );
+        case 2:
+            soundPlay( 'BangMd' );
             break;
         case 3:
         case 4:
-            soundPlay( 'BangMd' );
-            break;
         case 5:
         case 6:
             soundPlay( 'BangLg' );
@@ -492,7 +560,6 @@ function activeDeceleration () {
     
     // Fix inertia
     if (player.velocity.magnitude > 1) {
-        soundPlay( 'Thrust' );
         player.inertia.x -= Math.cos(toRadians(player.velocity.direction)) * player.acceleration.break;
         player.inertia.y -= Math.sin(toRadians(player.velocity.direction)) * player.acceleration.break;
     }
@@ -505,4 +572,31 @@ function playerLimitSpeed () {
             player.inertia.y -= Math.sin(toRadians(player.velocity.direction)) * player.acceleration.thrust;
         }
     }
+}
+
+function soundThrustCtl() {
+    if ( key.thrust || key.break || key.strafe.left || key.strafe.right ) {
+        myConst.thrustPlay();
+        if ( myConst.sounds.thrust.volume < 1 ) {
+            myConst.sounds.thrust.volume += 0.2;
+        }
+    }
+    else {
+        if ( myConst.sounds.thrust.volume > 0 ) {
+                myConst.sounds.thrust.volume -= 0.4;
+        }
+    }
+}
+
+function preRender() {
+    myConst.thrustPlay = (function() {
+        var executed = false;
+        return function () {
+            if (!executed) {
+                executed = true;
+                // do something
+                myConst.sounds.thrust.play({loop: -1});
+            }
+        };
+    })();
 }

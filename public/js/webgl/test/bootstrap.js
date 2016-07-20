@@ -1,4 +1,5 @@
 // Configurations
+var myConst = {};
 var config = {
     camera: {
         fov: 75,
@@ -16,7 +17,7 @@ var config = {
 
 // Setup
 var scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0x000000, 0.015, 100);
+scene.fog = new THREE.Fog(0x111111, 0.015, 100);
 
 var camera = new THREE.PerspectiveCamera (
     config.camera.fov,
