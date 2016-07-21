@@ -35,4 +35,5 @@ renderer.setSize (
     config.renderer.height
 );
 
-document.body.appendChild( renderer.domElement );
+$( '#game-container' ).append( renderer.domElement );
+//document.body.appendChild( renderer.domElement );

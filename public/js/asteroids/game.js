@@ -131,6 +131,7 @@ function render() {
     return 0;
 
     function game_enter() {
+        $( '#game-container' ).append( '<h1 style="color: red; position: absolute;">Test</h1>' );
         createRock(8,0,.02,.06, 3);
         createRock(8,8,.02,.06, 2);
         createRock(-10,-4,.04,.08, 3);

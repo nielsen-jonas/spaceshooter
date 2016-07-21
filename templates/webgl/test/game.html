@@ -4,7 +4,18 @@
     {{ parent() }}
     <style>
         body { margin: 0; }
-        canvas { width: 100%; height: 100%; }
+        #game-container {
+            width: 960px;
+            height: 540px;
+            position: relative;
+        }
+        canvas {
+            /*width: 100%;
+            height: 100%;*/
+            width: 960px;
+            height: 540px;
+            position: absolute; 
+        }
     </style>
 {% endblock %}
 {% block onload %}loadSounds();{% endblock %}
@@ -17,4 +28,8 @@
     <script src="{{ resource.js ~ 'asteroids/key.js' }}"></script>
     <script src="https://code.createjs.com/soundjs-0.6.2.min.js"></script>
     <script src="{{ resource.js ~ 'asteroids/game.js' }}"></script>
+{% endblock %}
+
+{% block content %}
+    <div id="game-container"></div>
 {% endblock %}
