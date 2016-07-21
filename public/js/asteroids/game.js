@@ -15,7 +15,9 @@ var CtlGame = {
     state: EnumGameState.GAME_ENTER,
     level: 1,
     score: 0,
+    score_pre: 0,
     lives: 3,
+    lives_pre: 3,
     rocks: []
 };
 var CtlMenu = {
@@ -130,8 +132,27 @@ function render() {
 
     return 0;
 
+    function hudRenderLives ( lives ) {
+        var render = '';
+        for ( i = 0; i < lives; i++ ) {
+            render += '&#5579;'
+        }
+        return render;
+    }
+
+    function hudRenderScore ( score ) {
+        return padToTwo( score );
+        function padToTwo(number) {
+            if (number<=99) { number = ("0"+number).slice(-2); }
+            return number;
+        }
+    }
+
     function game_enter() {
-        $( '#game-container' ).append( '<h1 style="color: red; position: absolute;">Test</h1>' );
+        CtlGame.score = 0;
+        CtlGame.lives = 3;
+        $( '#hud-score' ).html(hudRenderScore( CtlGame.score ));
+        $( '#hud-lives' ).html(hudRenderLives( CtlGame.lives ));
         createRock(8,0,.02,.06, 3);
         createRock(8,8,.02,.06, 2);
         createRock(-10,-4,.04,.08, 3);
@@ -151,6 +172,17 @@ function render() {
             CtlGame.state = EnumGameState.LEVEL_COMPLETE;
             return 0;
         }
+        // Update score
+        if (CtlGame.score_pre != CtlGame.score) {
+            CtlGame.score_pre = CtlGame.score;
+            $( '#hud-score' ).html(hudRenderScore( CtlGame.score ));
+        }
+        if (CtlGame.lives_pre != CtlGame.lives) {
+            CtlGame.lives_pre = CtlGame.lives;
+            $( '#hud-lives' ).html(hudRenderLives( CtlGame.lives ));
+        }
+        // Update lives
+
         // Thrust volume control based on key input
         soundThrustCtl();
 
@@ -194,6 +226,7 @@ function render() {
                 player.inertia.x = 0;
                 player.inertia.y = 0;
                 player.direction = 0;
+                CtlGame.lives -= 1;
             }
         });
 
@@ -608,14 +641,17 @@ function render() {
             switch( rock.type ) {
                 case 1:
                     soundPlay( 'BangSm' );
+                    CtlGame.score += 100;
                 case 2:
                     soundPlay( 'BangMd' );
+                    CtlGame.score += 50;
                     break;
                 case 3:
                 case 4:
                 case 5:
                 case 6:
                     soundPlay( 'BangLg' );
+                    CtlGame.score += 20;
                     break;
             }
             killObject( rock );

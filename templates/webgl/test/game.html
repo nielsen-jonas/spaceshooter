@@ -3,22 +3,77 @@
 {% block head %}
     {{ parent() }}
     <style>
-        body { margin: 0; }
+        body {
+            margin: 0;
+            font-family: 'Oswald', 'sans-serif';
+            font-size: 24px;
+        }
         #game-container {
             width: 960px;
             height: 540px;
             position: relative;
         }
+        #hud-container {
+            color: rgba( 255, 255, 255, .8);
+            position: absolute;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 1;
+        }
+        a {
+            color: rgba( 255, 255, 255, .8);
+            text-decoration: none;
+            padding: 0;
+            margin: 0;
+        }
+        #hud {
+            height: 100%;
+            width: 100%;
+        }
+        #hud-author {
+            font-size: 8px; letter-spacing: 2px; position: absolute; bottom: 40px; left: 0; right: 0;
+            color: rgba( 255, 255, 255, .3);
+            padding: 0;
+            margin: 0;
+        }
+        #hud-score-container {
+            position: absolute; top: 40px; left: 180px;
+            width: 90px;
+        }
+        #hud-score {
+            padding: 0;
+            margin: 0;
+            text-align: center;
+        }
+        #hud-lives {
+            position: absolute; top: 70px; left: 180px;
+            padding: 0;
+            margin: 0;
+        }
+        #hud-menu-container {
+            position: absolute;
+            top: 150px;
+            bottom: 150px;
+            left: 200px;
+            right: 200px;
+        }
         canvas {
-            /*width: 100%;
-            height: 100%;*/
-            width: 960px;
-            height: 540px;
+            width: 100%;
+            height: 100%;
             position: absolute; 
         }
     </style>
 {% endblock %}
 {% block onload %}loadSounds();{% endblock %}
+
+{% block links %}
+    <link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+{% endblock %}
 
 {% block scripts %}
     <script src="{{ resource.js ~ 'three.js/build/three.min.js' }}"></script>
@@ -31,5 +86,18 @@
 {% endblock %}
 
 {% block content %}
-    <div id="game-container"></div>
+    <div id="game-container">
+        <div id="hud-container">
+            <div id="hud">
+                <div id="hud-score-container"><p id="hud-score"></p></div>
+                <p id="hud-lives"></p>
+                <div id="hud-menu-container">
+                    <div id="hud-menu-main">
+                        <a href="#">START GAME</a>
+                    </div>
+                </div>
+                <p id="hud-author">2016 JONAS NIELSEN</p>
+            </div>
+        </div>
+    </div>
 {% endblock %}
