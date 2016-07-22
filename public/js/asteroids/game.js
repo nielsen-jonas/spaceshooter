@@ -11,8 +11,12 @@ var EnumMenuState = {
     OPTIONS: 1,
     SCOREBOARD: 2
 }
+var EnumGameOverState = {
+    CONSTRUCT: 0,
+    LOOP: 1
+}
 var CtlGame = {
-    state: EnumGameState.GAME_ENTER,
+    state: EnumGameState.MENU,
     level: 1,
     score: 0,
     score_pre: 0,
@@ -23,6 +27,9 @@ var CtlGame = {
 var CtlMenu = {
     state: EnumMenuState.MENU
 }
+var CtlGameOver = {
+    state: EnumGameOverState.CONSTRUCT
+}
 var EnumPlayerState = {
     SPAWN: 0,
     ALIVE: 1
@@ -31,10 +38,11 @@ var EnumPlayerState = {
 // Player properties
 var player = {
     state: {
-        player: EnumPlayerState.SPAWN,
-        spawn_cooldown: 10
+        player: EnumPlayerState.ALIVE,
+        player_pre: EnumPlayerState.ALIVE,
+        spawn_cooldown: 160
     },
-    spawn_cooldown: 10,
+    spawn_cooldown: 160,
     hyperspace: {
         out: false,
         in: false,
@@ -52,8 +60,8 @@ var player = {
     direction: 0,
     acceleration: {
         thrust: 1.5,
-        strafe: 1.25,
-        break: 2,
+        strafe: 1.5,
+        break: 1.5,
         rotation: 0.1
     },
     max: {
@@ -148,7 +156,43 @@ function render() {
         }
     }
 
+    function hudReset() {
+        $( '.hud' ).hide();
+        return 0;
+    }
+
+    function sceneReset() {
+        scene.remove( spaceship );
+        CtlGame.rocks.forEach( function( rock, index ) {
+            scene.remove( rock );
+        });
+        CtlGame.rocks = [];
+        return 0;
+    }
+
+    function soundReset() {
+        sounds.forEach( function( sound, index ) {
+            soundStop( sound.id );
+        });
+        return 0;
+    }
+
+    function menu() {
+        if ( !$('#hud-menu-main').is( ':visible' )) {
+            $( '#hud-menu-main' ).show( 600 );
+        } else {
+            $( '#hud-menu-main-start' ).click(function(e){
+                e.preventDefault();
+                CtlGame.state = EnumGameState.GAME_ENTER;
+                return false;
+            });
+        }
+        return 0;
+    }
+
     function game_enter() {
+        $( '#hud-menu-main' ).hide();
+        scene.add( spaceship );
         CtlGame.score = 0;
         CtlGame.lives = 3;
         $( '#hud-score' ).html(hudRenderScore( CtlGame.score ));
@@ -166,6 +210,31 @@ function render() {
         CtlGame.state = EnumGameState.LEVEL_PLAYING;
         return 0;
     }
+    function game_over() {
+        switch ( CtlGameOver.state ) {
+            case EnumGameOverState.CONSTRUCT:
+                gameOverConstruct();
+                break;
+            case EnumGameOverState.LOOP:
+                gameOverLoop();
+                break;
+        }
+        return 0;
+        function gameOverConstruct() {
+            hudReset();
+            scene.remove( spaceship );
+            soundReset();
+            myConst.sounds.gameOver.play({ loop: -1 });
+            CtlGameOver.state = EnumGameOverState.LOOP;
+            return 0;
+        }
+        function gameOverLoop() {
+            particleCtl();
+            projectileUpdate();
+            rockUpdate();
+            return 0;
+        }
+    }
     function level_playing() {
         // Level win condition
         if ( CtlGame.rocks.length == 0 ) {
@@ -177,11 +246,31 @@ function render() {
             CtlGame.score_pre = CtlGame.score;
             $( '#hud-score' ).html(hudRenderScore( CtlGame.score ));
         }
+        // Update lives
         if (CtlGame.lives_pre != CtlGame.lives) {
             CtlGame.lives_pre = CtlGame.lives;
             $( '#hud-lives' ).html(hudRenderLives( CtlGame.lives ));
+            if (CtlGame.lives <= 0) {
+                CtlGame.state = EnumGameState.GAME_OVER;
+            }
         }
-        // Update lives
+
+        // Player state spawn
+        if (player.state.player == EnumPlayerState.SPAWN) {
+            if ( player.state.spawn_cooldown > 0 ) {
+                player.state.spawn_cooldown --;
+            } else {
+                player.state.player = EnumPlayerState.ALIVE;
+            }
+        }
+
+        // Test player state change
+        if (player.state.player_pre != player.state.player ) {
+            player.state.player_pre = player.state.player;
+            if (player.state.player == EnumPlayerState.ALIVE ) {
+                spaceship_material.emissive.setRGB( 0, 0, 0 );
+            }
+        }
 
         // Thrust volume control based on key input
         soundThrustCtl();
@@ -220,13 +309,10 @@ function render() {
                 }
             });
             // Collision: Rock/Player
-            if (spaceshipRockCollision( spaceship, rock )) {
-                spaceship.position.x = 0;
-                spaceship.position.y = 0;
-                player.inertia.x = 0;
-                player.inertia.y = 0;
-                player.direction = 0;
-                CtlGame.lives -= 1;
+            if ( player.state.player == EnumPlayerState.ALIVE ) {
+                if (spaceshipRockCollision( spaceship, rock )) {
+                    playerDie();
+                }
             }
         });
 
@@ -322,52 +408,17 @@ function render() {
         return 0;
 
         // Functions
-        function rockUpdate() {
-            var kill = [];
-            var tmp = [];
-            CtlGame.rocks.forEach( function( rock, index ) {
-                // Update position
-                rock.time++;
-                rock.position.x += rock.inertia.x;
-                rock.position.y += rock.inertia.y;
-
-                limitToView ( rock );
-
-                if ( rock.health <= 0 ) {
-                    kill.push( rock );
-                    killRock( rock );
-                } else {
-                    tmp.push( rock );
-                }
-            });
-            CtlGame.rocks = tmp;
-            kill.forEach( function( rock, index ) {
-                parts.push(new ExplodeAnimation(rock.position.x, rock.position.y));
-                if ( rock.type >= 2 ) {
-                    var inertia = rockInertia();
-                    createRock( rock.position.x, rock.position.y, rock.inertia.x + inertia[0].x, rock.inertia.y + inertia[0].y, rock.type - 1 );
-                    createRock( rock.position.x, rock.position.y, rock.inertia.x + inertia[1].x, rock.inertia.y + inertia[1].y, rock.type - 1 );
-                }
-            });
-        }
-
-        function rockInertia() {
-            function rockInertiaRand() {
-                return .018 * myRand( -10, 10);
-            };
-            return [
-                {
-                    x: rockInertiaRand(),
-                    y: rockInertiaRand()
-                },
-                {
-                    x: rockInertiaRand(),
-                    y: rockInertiaRand()
-                },
-                {
-                    x: rockInertiaRand(),
-                    y: rockInertiaRand()
-                }]
+        function playerDie() {
+            player.state.player = EnumPlayerState.SPAWN;
+            spaceship.position.x = 0;
+            spaceship.position.y = 0;
+            player.inertia.x = 0;
+            player.inertia.y = 0;
+            player.direction = 0;
+            CtlGame.lives -= 1;
+            player.state.spawn_cooldown = player.spawn_cooldown;
+            spaceship_material.emissive.setRGB( .8, .8, .8 );
+            return 0;
         }
 
         function fire ( origin_x, origin_y, origin_z, inertia_x, inertia_y, rotation_z ) {
@@ -384,31 +435,6 @@ function render() {
             projectile.alive = true;
             projectiles.push( projectile );
             scene.add( projectile );
-        }
-
-        function projectileUpdate() {
-            var tmp = [];
-            projectiles.forEach( function( projectile, index ) {
-                // Update position
-                projectile.position.x += projectile.inertia.x;
-                projectile.position.y += projectile.inertia.y;
-                projectile.translateY(.8);
-                projectile.timer --;
-                
-                limitToView( projectile );
-
-                if (projectile.timer <= 0) {
-                    projectile.alive = false;
-                }
-
-                if (projectile.alive) {
-                    tmp.push( projectile );
-                } else {
-                    // Kill projectile
-                    killObject( projectile );
-                }
-            });
-            projectiles = tmp;
         }
 
         function playerWeaponBlasterFire() {
@@ -558,20 +584,6 @@ function render() {
             }
             return tmp;
         }
-        function limitToView ( object ) {
-            if (object.position.x < -(view.width / 2)) {
-                object.position.x += view.width;
-            }
-            if (object.position.x > (view.width / 2)) {
-                object.position.x -= view.width;
-            }
-            if (object.position.y < -(view.height / 2)) {
-                object.position.y += view.height;
-            }
-            if (object.position.y > (view.height / 2)) {
-                object.position.y -= view.height;
-            }
-        }
 
         function outsideView ( object ) {
             return (object.position.x < -(view.width / 2) ||
@@ -631,30 +643,6 @@ function render() {
                 return false;
             }
             return true;
-        }
-
-        function killObject ( object ) {
-            scene.remove( object );
-        }
-
-        function killRock ( rock ) {
-            switch( rock.type ) {
-                case 1:
-                    soundPlay( 'BangSm' );
-                    CtlGame.score += 100;
-                case 2:
-                    soundPlay( 'BangMd' );
-                    CtlGame.score += 50;
-                    break;
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                    soundPlay( 'BangLg' );
-                    CtlGame.score += 20;
-                    break;
-            }
-            killObject( rock );
         }
 
         function toRadians (angle) {
@@ -738,13 +726,38 @@ function render() {
                 myConst.sounds.thrust.volume = max_volume;
             }
         }
+    }
 
-        function particleCtl() {
-            var pCount = parts.length;
-            while(pCount--) {
-            parts[pCount].update();
-            }
+    function particleCtl() {
+        var pCount = parts.length;
+        while(pCount--) {
+        parts[pCount].update();
         }
+    }
+
+    function projectileUpdate() {
+        var tmp = [];
+        projectiles.forEach( function( projectile, index ) {
+            // Update position
+            projectile.position.x += projectile.inertia.x;
+            projectile.position.y += projectile.inertia.y;
+            projectile.translateY(.8);
+            projectile.timer --;
+            
+            limitToView( projectile );
+
+            if (projectile.timer <= 0) {
+                projectile.alive = false;
+            }
+
+            if (projectile.alive) {
+                tmp.push( projectile );
+            } else {
+                // Kill projectile
+                killObject( projectile );
+            }
+        });
+        projectiles = tmp;
     }
 
     function createRock ( origin_x, origin_y, inertia_x, inertia_y, type) {
@@ -760,5 +773,92 @@ function render() {
         rock.health = rock_health[type-1];
         CtlGame.rocks.push( rock );
         scene.add( rock );
+    }
+
+    function limitToView ( object ) {
+        if (object.position.x < -(view.width / 2)) {
+            object.position.x += view.width;
+        }
+        if (object.position.x > (view.width / 2)) {
+            object.position.x -= view.width;
+        }
+        if (object.position.y < -(view.height / 2)) {
+            object.position.y += view.height;
+        }
+        if (object.position.y > (view.height / 2)) {
+            object.position.y -= view.height;
+        }
+    }
+
+    function rockUpdate() {
+        var kill = [];
+        var tmp = [];
+        CtlGame.rocks.forEach( function( rock, index ) {
+            // Update position
+            rock.time++;
+            rock.position.x += rock.inertia.x;
+            rock.position.y += rock.inertia.y;
+
+            limitToView ( rock );
+
+            if ( rock.health <= 0 ) {
+                kill.push( rock );
+                killRock( rock );
+            } else {
+                tmp.push( rock );
+            }
+        });
+        CtlGame.rocks = tmp;
+        kill.forEach( function( rock, index ) {
+            parts.push(new ExplodeAnimation(rock.position.x, rock.position.y));
+            if ( rock.type >= 2 ) {
+                var inertia = rockInertia();
+                createRock( rock.position.x, rock.position.y, rock.inertia.x + inertia[0].x, rock.inertia.y + inertia[0].y, rock.type - 1 );
+                createRock( rock.position.x, rock.position.y, rock.inertia.x + inertia[1].x, rock.inertia.y + inertia[1].y, rock.type - 1 );
+            }
+        });
+    }
+
+    function rockInertia() {
+        function rockInertiaRand() {
+            return .018 * myRand( -10, 10);
+        };
+        return [
+            {
+                x: rockInertiaRand(),
+                y: rockInertiaRand()
+            },
+            {
+                x: rockInertiaRand(),
+                y: rockInertiaRand()
+            },
+            {
+                x: rockInertiaRand(),
+                y: rockInertiaRand()
+            }]
+    }
+
+    function killRock ( rock ) {
+        switch( rock.type ) {
+            case 1:
+                soundPlay( 'BangSm' );
+                CtlGame.score += 100;
+            case 2:
+                soundPlay( 'BangMd' );
+                CtlGame.score += 50;
+                break;
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+                soundPlay( 'BangLg' );
+                CtlGame.score += 20;
+                break;
+        }
+        killObject( rock );
+    }
+
+    function killObject ( object ) {
+        scene.remove( object );
     }
 }

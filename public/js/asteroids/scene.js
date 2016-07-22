@@ -14,13 +14,12 @@ var position = new THREE.Vector3(0,0,0);
 var star = addLensFlare( textureFlare, flareColor, position, 1.5, false);
 scene.add( star );
 
-var geometry = new THREE.CylinderGeometry( .2, .6, 1.4, 16 );
-var texture = new THREE.TextureLoader().load('http://slim/img/rasta.jpg');
-var material = new THREE.MeshLambertMaterial({
-    map: texture
+var spaceship_geometry = new THREE.CylinderGeometry( .2, .6, 1.4, 16 );
+var spaceship_texture = new THREE.TextureLoader().load('http://slim/img/rasta.jpg');
+var spaceship_material = new THREE.MeshLambertMaterial({
+    map: spaceship_texture
 });
-var spaceship = new THREE.Mesh( geometry, material );
-scene.add( spaceship );
+var spaceship = new THREE.Mesh( spaceship_geometry, spaceship_material );
 
 // Lights
 var ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
@@ -105,12 +104,14 @@ var sounds = [
     { src: 'hit4.wav', id: 'Hit4'},
     { src: 'hit5.wav', id: 'Hit5'},
     { src: 'hit6.wav', id: 'Hit6'},
+    { src: 'bg/bg_gameover_loop.wav', id: 'GameOver'},
 
 ];
 function loadSounds() {
   createjs.Sound.registerSounds( sounds, assetPath );
   myConst.sounds = {};
   myConst.sounds.thrust = createjs.Sound.play( 'Thrust' );
+  myConst.sounds.gameOver = createjs.Sound.play( 'GameOver' );
 }
 function soundPlay(sound) {
     createjs.Sound.play( sound );
@@ -127,16 +128,16 @@ function soundRemoveAll() {
 
 // Particle explosion effect
 //////////////settings/////////
-var movementSpeed = .8;
+/*var movementSpeed = .8;
 var totalObjects = 400;
 var objectSize = .06;
-var sizeRandomness = 10000;
+var sizeRandomness = 10000;*/
 //var colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
 /////////////////////////////////
 var dirs = [];
 var parts = [];
 
-function ExplodeAnimation(x,y)
+function ExplodeAnimation(x,y, color = 0xBBBBBB, totalObjects = 400, movementSpeed = .8, objectSize = .06, sizeRandomness = 10000)
 {
   var geometry = new THREE.Geometry();
   
@@ -151,8 +152,7 @@ function ExplodeAnimation(x,y)
     dirs.push({x:(Math.random() * movementSpeed)-(movementSpeed/2),y:(Math.random() * movementSpeed)-(movementSpeed/2),z:(Math.random() * movementSpeed)-(movementSpeed/2)});
   }
 
-  //var material = new THREE.PointsMaterial( { size: objectSize,  color: colors[Math.round(Math.random() * colors.length)] });
-  var material = new THREE.PointsMaterial( { size: objectSize,  color: 0xBBBBBB });
+  var material = new THREE.PointsMaterial( { size: objectSize,  color: color });
   var particles = new THREE.Points( geometry, material );
   this.lifetime = 2000;
   this.object = particles;
