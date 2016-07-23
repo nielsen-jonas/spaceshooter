@@ -55,14 +55,14 @@
             padding: 0;
             margin: 0;
         }
-        #hud-menu-container {
+        #hud-menu-container, #hud-game-over-container  {
             position: absolute;
             top: 150px;
             bottom: 150px;
             left: 200px;
             right: 200px;
         }
-        #hud-menu-main {
+        .hud {
             display: none;
         }
         canvas {
@@ -96,10 +96,18 @@
                     <div id="hud-score-container"><p id="hud-score"></p></div>
                     <p id="hud-lives"></p>
                 </div>
-                <div id="hud-menu-container" class="hud">
-                    <div id="hud-menu-main">
+                <div id="hud-menu-container">
+                    <div id="hud-menu-main" class="hud">
                         <a id="hud-menu-main-start" href="#">START GAME</a>
                     </div>
+                </div>
+                <div id="hud-game-over-container" class="hud">
+                    <h1>
+                        <div>GAME OVER</div>
+                        <div>SCORE: <span id="hud-game-over-score"></span></div>
+                    </h1>
+
+                    <a id="hud-game-over-menu"href="#">MENU</a>
                 </div>
                 <p id="hud-author">2016 JONAS NIELSEN</p>
             </div>

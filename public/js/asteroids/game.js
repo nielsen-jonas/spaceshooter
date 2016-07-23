@@ -7,9 +7,8 @@ var EnumGameState = {
     GAME_OVER: 5
 }
 var EnumMenuState = {
-    MENU: 0,
-    OPTIONS: 1,
-    SCOREBOARD: 2
+    CONSTRUCT: 0,
+    LOOP: 1
 }
 var EnumGameOverState = {
     CONSTRUCT: 0,
@@ -25,7 +24,7 @@ var CtlGame = {
     rocks: []
 };
 var CtlMenu = {
-    state: EnumMenuState.MENU
+    state: EnumMenuState.CONSTRUCT
 }
 var CtlGameOver = {
     state: EnumGameOverState.CONSTRUCT
@@ -38,7 +37,7 @@ var EnumPlayerState = {
 // Player properties
 var player = {
     state: {
-        player: EnumPlayerState.ALIVE,
+        player: EnumPlayerState.SPAWN,
         player_pre: EnumPlayerState.ALIVE,
         spawn_cooldown: 160
     },
@@ -140,73 +139,58 @@ function render() {
 
     return 0;
 
-    function hudRenderLives ( lives ) {
-        var render = '';
-        for ( i = 0; i < lives; i++ ) {
-            render += '&#5579;'
-        }
-        return render;
-    }
-
-    function hudRenderScore ( score ) {
-        return padToTwo( score );
-        function padToTwo(number) {
-            if (number<=99) { number = ("0"+number).slice(-2); }
-            return number;
-        }
-    }
-
-    function hudReset() {
-        $( '.hud' ).hide();
-        return 0;
-    }
-
-    function sceneReset() {
-        scene.remove( spaceship );
-        CtlGame.rocks.forEach( function( rock, index ) {
-            scene.remove( rock );
-        });
-        CtlGame.rocks = [];
-        return 0;
-    }
-
-    function soundReset() {
-        sounds.forEach( function( sound, index ) {
-            soundStop( sound.id );
-        });
-        return 0;
-    }
-
     function menu() {
-        if ( !$('#hud-menu-main').is( ':visible' )) {
-            $( '#hud-menu-main' ).show( 600 );
-        } else {
+        switch (CtlMenu.state) {
+            case EnumMenuState.CONSTRUCT:
+                menuConstruct();
+                break;
+            case EnumMenuState.LOOP:
+                menuLoop();
+                break;
+        }
+
+        return 0;
+        function menuConstruct(){
+            soundReset();
+            hudReset();
+            if ( !$('#hud-menu-main').is( ':visible' )) {
+                $( '#hud-menu-main' ).show( 600 );
+            }
+            CtlMenu.state = EnumMenuState.LOOP;
+            return 0;
+        }
+        function menuLoop(){
             $( '#hud-menu-main-start' ).click(function(e){
                 e.preventDefault();
                 CtlGame.state = EnumGameState.GAME_ENTER;
                 return false;
             });
+            particleCtl();
+            projectileUpdate();
+            rockUpdate();
+            return 0;
         }
-        return 0;
     }
 
     function game_enter() {
-        $( '#hud-menu-main' ).hide();
+        soundReset();
+        sceneReset();
+        stateResetGame();
+        hudReset();
+        if ( !$('#hud-level-container').is( ':visible' )) {
+            $( '#hud-level-container' ).show( 600 );
+        } 
         scene.add( spaceship );
         CtlGame.score = 0;
         CtlGame.lives = 3;
         $( '#hud-score' ).html(hudRenderScore( CtlGame.score ));
         $( '#hud-lives' ).html(hudRenderLives( CtlGame.lives ));
-        createRock(8,0,.02,.06, 3);
-        createRock(8,8,.02,.06, 2);
-        createRock(-10,-4,.04,.08, 3);
+        createRock(5, 8, 0, .05, .02);
         CtlGame.state = EnumGameState.LEVEL_PLAYING;
         return 0;
     }
     function level_complete() {
-        createRock(8,0,.02,.06, 3);
-        createRock(8,8,.02,.06, 2);
-        createRock(-10,-4,.04,.08, 3);
+        createRock(5, 8, 0, .05, .02);
         CtlGame.state = EnumGameState.LEVEL_PLAYING;
         return 0;
     }
@@ -222,6 +206,10 @@ function render() {
         return 0;
         function gameOverConstruct() {
             hudReset();
+            if ( !$('#hud-game-over-container').is( ':visible' )) {
+                $( '#hud-game-over-container' ).show( 600 );
+            }
+            $( '#hud-game-over-score' ).html(hudRenderScore( CtlGame.score ));
             scene.remove( spaceship );
             soundReset();
             myConst.sounds.gameOver.play({ loop: -1 });
@@ -229,6 +217,13 @@ function render() {
             return 0;
         }
         function gameOverLoop() {
+            $( '#hud-game-over-menu' ).click(function(e){
+                e.preventDefault();
+                stateResetMenu();
+                stateResetGameOver();
+                CtlGame.state = EnumGameState.MENU;
+                return false;
+            });
             particleCtl();
             projectileUpdate();
             rockUpdate();
@@ -258,6 +253,11 @@ function render() {
         // Player state spawn
         if (player.state.player == EnumPlayerState.SPAWN) {
             if ( player.state.spawn_cooldown > 0 ) {
+                var sin = Math.sin(player.state.spawn_cooldown);
+                if ( sin > .2 ) {
+                    sin = .2;
+                }
+                spaceship_material.emissive.setRGB( sin, sin, sin);
                 player.state.spawn_cooldown --;
             } else {
                 player.state.player = EnumPlayerState.ALIVE;
@@ -410,14 +410,13 @@ function render() {
         // Functions
         function playerDie() {
             player.state.player = EnumPlayerState.SPAWN;
+            player.state.spawn_cooldown = player.spawn_cooldown;
             spaceship.position.x = 0;
             spaceship.position.y = 0;
             player.inertia.x = 0;
             player.inertia.y = 0;
             player.direction = 0;
             CtlGame.lives -= 1;
-            player.state.spawn_cooldown = player.spawn_cooldown;
-            spaceship_material.emissive.setRGB( .8, .8, .8 );
             return 0;
         }
 
@@ -574,6 +573,8 @@ function render() {
             }
         }
 
+
+
         function lockDegrees ( deg ) {
             var tmp = deg;
             while (tmp > 360) {
@@ -728,6 +729,64 @@ function render() {
         }
     }
 
+    function hudRenderLives ( lives ) {
+        var render = '';
+        for ( i = 0; i < lives; i++ ) {
+            render += '&#5579;'
+        }
+        return render;
+    }
+
+    function hudRenderScore ( score ) {
+        return padToTwo( score );
+        function padToTwo(number) {
+            if (number<=99) { number = ("0"+number).slice(-2); }
+            return number;
+        }
+    }
+
+    function stateResetGame() {
+        CtlGame.state = EnumGameState.MENU;
+        CtlGame.level = 1;
+        CtlGame.score = 0;
+        CtlGame.score_pre = 0;
+        CtlGame.lives = 3;
+        CtlGame.lives_pre = 3;
+        CtlGame.rocks = [];
+        player.state.player = EnumPlayerState.SPAWN;
+        player.state.player_pre = EnumPlayerState.ALIVE;
+        player.state.spawn_cooldown = player.spawn_cooldown;
+    }
+
+    function stateResetGameOver() {
+        CtlGameOver.state = EnumGameOverState.CONSTRUCT;
+    }
+
+    function stateResetMenu() {
+        CtlMenu.state = EnumMenuState.CONSTRUCT;
+    }
+
+    function hudReset() {
+        $( '.hud' ).hide();
+        return 0;
+    }
+
+    function sceneReset() {
+        scene.remove( spaceship );
+        CtlGame.rocks.forEach( function( rock, index ) {
+            scene.remove( rock );
+        });
+        CtlGame.rocks = [];
+        return 0;
+    }
+
+    function soundReset() {
+        sounds.forEach( function( sound, index ) {
+            soundStop( sound.id );
+        });
+        return 0;
+    }
+
     function particleCtl() {
         var pCount = parts.length;
         while(pCount--) {
@@ -760,7 +819,7 @@ function render() {
         projectiles = tmp;
     }
 
-    function createRock ( origin_x, origin_y, inertia_x, inertia_y, type) {
+    function createRock ( type = 3, origin_x = 0, origin_y = 0, inertia_x = 0, inertia_y = 0) {
         var rock_geometry = new THREE.SphereGeometry( rock_radius[type-1] );
         var rock = new THREE.Mesh ( rock_geometry, rock_material );
         rock.position.x = origin_x;
@@ -813,15 +872,15 @@ function render() {
             parts.push(new ExplodeAnimation(rock.position.x, rock.position.y));
             if ( rock.type >= 2 ) {
                 var inertia = rockInertia();
-                createRock( rock.position.x, rock.position.y, rock.inertia.x + inertia[0].x, rock.inertia.y + inertia[0].y, rock.type - 1 );
-                createRock( rock.position.x, rock.position.y, rock.inertia.x + inertia[1].x, rock.inertia.y + inertia[1].y, rock.type - 1 );
+                createRock( rock.type - 1, rock.position.x, rock.position.y, rock.inertia.x + inertia[0].x, rock.inertia.y + inertia[0].y);
+                createRock( rock.type - 1, rock.position.x, rock.position.y, rock.inertia.x + inertia[1].x, rock.inertia.y + inertia[1].y);
             }
         });
     }
 
     function rockInertia() {
         function rockInertiaRand() {
-            return .018 * myRand( -10, 10);
+            return .002 * myRand( -80, 80);
         };
         return [
             {
