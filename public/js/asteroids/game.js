@@ -14,6 +14,11 @@ var EnumGameOverState = {
     CONSTRUCT: 0,
     LOOP: 1
 }
+var EnumPauseState = {
+    CONSTRUCT: 0,
+    LOOP: 1,
+    UNPAUSE: 2
+}
 var CtlGame = {
     state: EnumGameState.MENU,
     level: 1,
@@ -29,6 +34,10 @@ var CtlMenu = {
 var CtlGameOver = {
     state: EnumGameOverState.CONSTRUCT
 }
+CtlPause = {
+    state: EnumPauseState.CONSTRUCT
+}
+
 var EnumPlayerState = {
     SPAWN: 0,
     ALIVE: 1
@@ -137,6 +146,9 @@ function render() {
 
     renderer.render( scene, camera );
 
+    // Pressed keys reset
+    keypress.reset();
+
     return 0;
 
     function menu() {
@@ -192,6 +204,7 @@ function render() {
     function level_complete() {
         createRock(5, 8, 0, .05, .02);
         CtlGame.state = EnumGameState.LEVEL_PLAYING;
+        player.state.player = EnumPlayerState.SPAWN;
         return 0;
     }
     function game_over() {
@@ -230,7 +243,51 @@ function render() {
             return 0;
         }
     }
+
+    function level_pause() {
+
+        switch ( CtlPause.state ) {
+            case EnumPauseState.CONSTRUCT:
+                pauseConstruct();
+                break;
+            case EnumPauseState.LOOP:
+                pauseLoop();
+                break;
+            case EnumPauseState.UNPAUSE:
+                pauseUnpause();
+                break;
+        }
+
+        return 0;
+
+        function pauseConstruct() {
+            soundPause();
+            CtlPause.state = EnumPauseState.LOOP;
+            return 0;
+        }
+
+        function pauseLoop() {
+            // Unpause
+            if ( keypress.pause ) {
+                CtlPause.state = EnumPauseState.UNPAUSE;
+            }
+            return 0;
+        }
+
+        function pauseUnpause() {
+            soundUnpause();
+            stateResetPause();
+            CtlGame.state = EnumGameState.LEVEL_PLAYING;
+            return 0;
+        }
+    }
+
     function level_playing() {
+        // Pause
+        if ( keypress.pause ) {
+            CtlGame.state = EnumGameState.LEVEL_PAUSE;
+            return 0;
+        }
         // Level win condition
         if ( CtlGame.rocks.length == 0 ) {
             CtlGame.state = EnumGameState.LEVEL_COMPLETE;
@@ -250,6 +307,16 @@ function render() {
             }
         }
 
+        // Test player state change
+        if (player.state.player_pre != player.state.player ) {
+            player.state.player_pre = player.state.player;
+            if (player.state.player == EnumPlayerState.ALIVE ) {
+                spaceship_material.emissive.setRGB( 0, 0, 0 );
+            } else {
+                player.state.spawn_cooldown = player.spawn_cooldown;
+            }
+        }
+
         // Player state spawn
         if (player.state.player == EnumPlayerState.SPAWN) {
             if ( player.state.spawn_cooldown > 0 ) {
@@ -261,14 +328,6 @@ function render() {
                 player.state.spawn_cooldown --;
             } else {
                 player.state.player = EnumPlayerState.ALIVE;
-            }
-        }
-
-        // Test player state change
-        if (player.state.player_pre != player.state.player ) {
-            player.state.player_pre = player.state.player;
-            if (player.state.player == EnumPlayerState.ALIVE ) {
-                spaceship_material.emissive.setRGB( 0, 0, 0 );
             }
         }
 
@@ -410,7 +469,6 @@ function render() {
         // Functions
         function playerDie() {
             player.state.player = EnumPlayerState.SPAWN;
-            player.state.spawn_cooldown = player.spawn_cooldown;
             spaceship.position.x = 0;
             spaceship.position.y = 0;
             player.inertia.x = 0;
@@ -765,6 +823,9 @@ function render() {
     function stateResetMenu() {
         CtlMenu.state = EnumMenuState.CONSTRUCT;
     }
+    function stateResetPause() {
+        CtlPause.state = EnumPauseState.CONSTRUCT;
+    }
 
     function hudReset() {
         $( '.hud' ).hide();
@@ -783,6 +844,20 @@ function render() {
     function soundReset() {
         sounds.forEach( function( sound, index ) {
             soundStop( sound.id );
+        });
+        return 0;
+    }
+
+    function soundPause() {
+        sounds.forEach( function( sound, index ) {
+            sound.pause = true;
+        });
+        return 0;
+    }
+
+    function soundUnpause() {
+        sounds.forEach( function( sound, index ) {
+            sound.pause = false;
         });
         return 0;
     }
@@ -900,17 +975,23 @@ function render() {
     function killRock ( rock ) {
         switch( rock.type ) {
             case 1:
-                soundPlay( 'BangSm' );
+                //soundPlay( 'BangSm' );
+                myConst.sounds.bangSm.position = 0;
+                myConst.sounds.bangSm.play();
                 CtlGame.score += 100;
             case 2:
-                soundPlay( 'BangMd' );
+                //soundPlay( 'BangMd' );
+                myConst.sounds.bangMd.position = 0;
+                myConst.sounds.bangMd.play();
                 CtlGame.score += 50;
                 break;
             case 3:
             case 4:
             case 5:
             case 6:
-                soundPlay( 'BangLg' );
+                ///soundPlay( 'BangLg' );
+                myConst.sounds.bangLg.position = 0;
+                myConst.sounds.bangLg.play();
                 CtlGame.score += 20;
                 break;
         }

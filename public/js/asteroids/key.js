@@ -1,4 +1,11 @@
 // Controls
+var keypress = {
+    pause: false,
+    reset: function() {
+        this.pause = false;
+    }
+}
+
 var key = {
     thrust: false,
     break: false,
@@ -21,22 +28,15 @@ var key = {
 }
 var keys;
 
-// Test
-keys = 't';
-Mousetrap.bind(keys, function() {
-    key.test = true;
-    return false;
-}, 'keydown');
-Mousetrap.bind(keys, function() {
-    key.test = false;
-    return false;
-}, 'keyup');
+// KEYPRESS
 
 // Pause
 Mousetrap.bind('p', function() {
-    alert('P A U S E');
+    keypress.pause = true;
     return false;
 }, 'keydown')
+
+// KEY
 
 // Hyperspace
 Mousetrap.bind('enter', function() {

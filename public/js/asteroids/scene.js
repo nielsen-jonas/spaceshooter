@@ -112,9 +112,23 @@ function loadSounds() {
   myConst.sounds = {};
   myConst.sounds.thrust = createjs.Sound.play( 'Thrust' );
   myConst.sounds.gameOver = createjs.Sound.play( 'GameOver' );
+  myConst.sounds.bangSm = createjs.Sound.play( 'BangSm' );
+  myConst.sounds.bangMd = createjs.Sound.play( 'BangMd' );
+  myConst.sounds.bangLg = createjs.Sound.play( 'BangLg' );
 }
+
 function soundPlay(sound) {
     createjs.Sound.play( sound );
+}
+function soundAllPause() {
+    myConst.sounds.forEach( function( index, sound ) {
+        sound.pause = true;
+    });
+}
+function soundAllUnpause() {
+    myConst.sounds.forEach( function( index, sound ) {
+        sound.pause = false;
+    });
 }
 function soundStop( sound ) {
   createjs.Sound.stop( sound );
