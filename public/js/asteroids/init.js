@@ -1,5 +1,6 @@
 // Configurations
 var myConst = {};
+var myGlobals = {};
 var config = {
     camera: {
         fov: 75,

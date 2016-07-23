@@ -90,55 +90,53 @@ function addLensFlare( textureFlare, flareColor, position, size, overrideImage){
   return lensFlare;
 }
 
-// Load sounds
-var assetPath = 'http://slim/sound/jonas/';
-var sounds = [
-    { src: 'fire.wav', id: 'Blaster'},
-    { src: 'thrust.wav', id: 'Thrust'},
-    { src: 'rock1_exp.wav', id: 'BangSm'},
-    { src: 'rock2_exp.wav', id: 'BangMd'},
-    { src: 'rock3_exp.wav', id: 'BangLg'},
-    { src: 'hit1.wav', id: 'Hit1'},
-    { src: 'hit2.wav', id: 'Hit2'},
-    { src: 'hit3.wav', id: 'Hit3'},
-    { src: 'hit4.wav', id: 'Hit4'},
-    { src: 'hit5.wav', id: 'Hit5'},
-    { src: 'hit6.wav', id: 'Hit6'},
-    { src: 'bg/bg_gameover_loop.wav', id: 'GameOver'},
-
-];
-function loadSounds() {
-  createjs.Sound.registerSounds( sounds, assetPath );
-  myConst.sounds = {};
-  myConst.sounds.thrust = createjs.Sound.play( 'Thrust' );
-  myConst.sounds.gameOver = createjs.Sound.play( 'GameOver' );
-  myConst.sounds.bangSm = createjs.Sound.play( 'BangSm' );
-  myConst.sounds.bangMd = createjs.Sound.play( 'BangMd' );
-  myConst.sounds.bangLg = createjs.Sound.play( 'BangLg' );
-}
-
-function soundPlay(sound) {
-    createjs.Sound.play( sound );
-}
-function soundAllPause() {
-    myConst.sounds.forEach( function( index, sound ) {
-        sound.pause = true;
-    });
-}
-function soundAllUnpause() {
-    myConst.sounds.forEach( function( index, sound ) {
-        sound.pause = false;
-    });
-}
-function soundStop( sound ) {
-  createjs.Sound.stop( sound );
-}
-function soundRemove( sound ) {
-  createjs.Sound.removeSound( sound );
-} 
-function soundRemoveAll() {
-    createjs.Sound.removeAllSounds();
-}
+// Sound
+myGlobals.sound = {
+    clip: {},
+    asset: {
+        path: 'http://slim/sound/jonas/',
+        files: [
+            { src: 'fire.wav', id: 'Blaster'},
+            { src: 'thrust.wav', id: 'Thrust'},
+            { src: 'rock1_exp.wav', id: 'BangSm'},
+            { src: 'rock2_exp.wav', id: 'BangMd'},
+            { src: 'rock3_exp.wav', id: 'BangLg'},
+            { src: 'hit1.wav', id: 'Hit1'},
+            { src: 'hit2.wav', id: 'Hit2'},
+            { src: 'hit3.wav', id: 'Hit3'},
+            { src: 'hit4.wav', id: 'Hit4'},
+            { src: 'hit5.wav', id: 'Hit5'},
+            { src: 'hit6.wav', id: 'Hit6'},
+            { src: 'bg/bg_gameover_loop.wav', id: 'GameOver'},
+        ]
+    },
+    load: function() {
+        createjs.Sound.registerSounds( this.asset.files, this.asset.path );
+        this.clip.Blaster = createjs.Sound.play( 'Blaster' );
+        this.clip.Thrust = createjs.Sound.play( 'Thrust' );
+        this.clip.GameOver = createjs.Sound.play( 'GameOver' );
+        this.clip.BangSm = createjs.Sound.play( 'BangSm' );
+        this.clip.BangMd = createjs.Sound.play( 'BangMd' );
+        this.clip.BangLg = createjs.Sound.play( 'BangLg' );
+    },
+    pause: function() {
+        $.each( this.clip, function( index, clip ) {
+            clip.paused = true;
+        });
+        return 0;
+    },
+    unpause: function() {
+        $.each( this.clip, function( index, clip ) {
+            clip.paused = false;
+        });
+        return 0;
+    },
+    stop: function() {
+        $.each( this.clip, function( index, clip ) {
+            clip.stop();
+        });
+    }
+};
 
 // Particle explosion effect
 //////////////settings/////////

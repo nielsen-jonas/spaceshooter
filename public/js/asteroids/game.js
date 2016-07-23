@@ -108,13 +108,13 @@ function myRand( min, max ) {
 }
 
 function preRender() {
-    myConst.thrustPlay = (function() {
+    myGlobals.thrustPlay = (function() {
         var executed = false;
         return function () {
             if (!executed) {
                 executed = true;
                 // do something
-                myConst.sounds.thrust.play({loop: -1});
+                myGlobals.sound.clip.Thrust.play( {loop: -1} );
             }
         };
     })();
@@ -163,7 +163,7 @@ function render() {
 
         return 0;
         function menuConstruct(){
-            soundReset();
+            myGlobals.sound.stop();
             hudReset();
             if ( !$('#hud-menu-main').is( ':visible' )) {
                 $( '#hud-menu-main' ).show( 600 );
@@ -185,7 +185,7 @@ function render() {
     }
 
     function game_enter() {
-        soundReset();
+        myGlobals.sound.stop();
         sceneReset();
         stateResetGame();
         hudReset();
@@ -224,8 +224,8 @@ function render() {
             }
             $( '#hud-game-over-score' ).html(hudRenderScore( CtlGame.score ));
             scene.remove( spaceship );
-            soundReset();
-            myConst.sounds.gameOver.play({ loop: -1 });
+            myGlobals.sound.stop();
+            myGlobals.sound.clip.GameOver.play( { loop: -1 } );
             CtlGameOver.state = EnumGameOverState.LOOP;
             return 0;
         }
@@ -261,7 +261,7 @@ function render() {
         return 0;
 
         function pauseConstruct() {
-            soundPause();
+            myGlobals.sound.pause();
             CtlPause.state = EnumPauseState.LOOP;
             return 0;
         }
@@ -275,7 +275,7 @@ function render() {
         }
 
         function pauseUnpause() {
-            soundUnpause();
+            myGlobals.sound.unpause();
             stateResetPause();
             CtlGame.state = EnumGameState.LEVEL_PLAYING;
             return 0;
@@ -481,7 +481,8 @@ function render() {
         }
 
         function fire ( origin_x, origin_y, origin_z, inertia_x, inertia_y, rotation_z ) {
-            soundPlay('Blaster');
+            myGlobals.sound.clip.Blaster.position = 0;
+            myGlobals.sound.clip.Blaster.play();
             var projectile = new THREE.Mesh( projectile_geometry, projectile_material );
             projectile.position.x = origin_x;
             projectile.position.y = origin_y;
@@ -767,14 +768,14 @@ function render() {
 
         function soundThrustCtl() {
             if ( key.thrust || key.break || key.strafe.left || key.strafe.right) {
-                myConst.thrustPlay(); // Can only be called once
-                if ( myConst.sounds.thrust.volume < 1 ) {
-                    myConst.sounds.thrust.volume += 0.2;
+                myGlobals.thrustPlay(); // Can only be called once
+                if (myGlobals.sound.clip.Thrust.volume < 1 ) {
+                    myGlobals.sound.clip.Thrust.volume += 0.2;
                 }
             }
             else {
-                if ( myConst.sounds.thrust.volume > 0 ) {
-                        myConst.sounds.thrust.volume -= 0.4;
+                if ( myGlobals.sound.clip.Thrust.volume > 0 ) {
+                        myGlobals.sound.clip.Thrust.volume -= 0.4;
                 }
             }
             if ( player.hyperspace.out || player.hyperspace.in ) {
@@ -783,8 +784,8 @@ function render() {
                 } else {
                     var max_volume = 1;
                 }
-                if ( myConst.sounds.thrust.volume > max_volume)
-                myConst.sounds.thrust.volume = max_volume;
+                if ( myGlobals.sound.clip.Thrust.volume > max_volume)
+                myGlobals.sound.clip.Thrust.volume = max_volume;
             }
         }
     }
@@ -843,24 +844,10 @@ function render() {
         return 0;
     }
 
-    function soundReset() {
-        sounds.forEach( function( sound, index ) {
-            soundStop( sound.id );
-        });
-        return 0;
-    }
-
-    function soundPause() {
-        sounds.forEach( function( sound, index ) {
-            sound.pause = true;
-        });
-        return 0;
-    }
-
     function soundUnpause() {
-        sounds.forEach( function( sound, index ) {
+        /*sounds.forEach( function( sound, index ) {
             sound.pause = false;
-        });
+        });*/
         return 0;
     }
 
@@ -977,23 +964,20 @@ function render() {
     function killRock ( rock ) {
         switch( rock.type ) {
             case 1:
-                //soundPlay( 'BangSm' );
-                myConst.sounds.bangSm.position = 0;
-                myConst.sounds.bangSm.play();
+                myGlobals.sound.clip.BangSm.position = 0;
+                myGlobals.sound.clip.BangSm.play();
                 CtlGame.score += 100;
             case 2:
-                //soundPlay( 'BangMd' );
-                myConst.sounds.bangMd.position = 0;
-                myConst.sounds.bangMd.play();
+                myGlobals.sound.clip.BangMd.position = 0;
+                myGlobals.sound.clip.BangMd.play();
                 CtlGame.score += 50;
                 break;
             case 3:
             case 4:
             case 5:
             case 6:
-                ///soundPlay( 'BangLg' );
-                myConst.sounds.bangLg.position = 0;
-                myConst.sounds.bangLg.play();
+                myGlobals.sound.clip.BangLg.position = 0;
+                myGlobals.sound.clip.BangLg.play();
                 CtlGame.score += 20;
                 break;
         }
