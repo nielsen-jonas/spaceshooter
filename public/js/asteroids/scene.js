@@ -108,6 +108,7 @@ myGlobals.sound = {
             { src: 'hit5.wav', id: 'Hit5'},
             { src: 'hit6.wav', id: 'Hit6'},
             { src: 'bg/bg_gameover_loop.wav', id: 'GameOver'},
+            { src: 'bg/bg_aerodynamic_loop.wav', id: 'Menu'},
         ]
     },
     load: function() {
@@ -115,6 +116,7 @@ myGlobals.sound = {
         this.clip.Blaster = createjs.Sound.play( 'Blaster' );
         this.clip.Thrust = createjs.Sound.play( 'Thrust' );
         this.clip.GameOver = createjs.Sound.play( 'GameOver' );
+        this.clip.Menu = createjs.Sound.play( 'Menu' );
         this.clip.BangSm = createjs.Sound.play( 'BangSm' );
         this.clip.BangMd = createjs.Sound.play( 'BangMd' );
         this.clip.BangLg = createjs.Sound.play( 'BangLg' );

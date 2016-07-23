@@ -100,8 +100,10 @@ var rock_health = [1, 1, 1, 1, 1, 1];
 fireTimer = new THREE.Clock( true );
 firerate = player.weapon.blaster.firerate;
 
-preRender();
-render();
+$( document ).ready( function () {
+    preRender();
+    render();
+});
 
 function myRand( min, max ) {
     return Math.floor(Math.random()*(max-min+1)+min); 
@@ -164,6 +166,7 @@ function render() {
         return 0;
         function menuConstruct(){
             myGlobals.sound.stop();
+            myGlobals.sound.clip.Menu.play( { loop: -1 } );
             hudReset();
             if ( !$('#hud-menu-main').is( ':visible' )) {
                 $( '#hud-menu-main' ).show( 600 );
@@ -193,8 +196,7 @@ function render() {
             $( '#hud-level-container' ).show( 600 );
         } 
         scene.add( spaceship );
-        CtlGame.score = 0;
-        CtlGame.lives = 3;
+
         $( '#hud-score' ).html(hudRenderScore( CtlGame.score ));
         $( '#hud-lives' ).html(hudRenderLives( CtlGame.lives ));
         createRock(5, 8, 0, .05, .02);
