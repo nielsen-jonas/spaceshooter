@@ -321,8 +321,10 @@ function render() {
         if (player.state.player == EnumPlayerState.SPAWN) {
             if ( player.state.spawn_cooldown > 0 ) {
                 var sin = Math.sin(player.state.spawn_cooldown);
-                if ( sin > .2 ) {
-                    sin = .2;
+                if ( sin > .5 ) {
+                    sin = .5;
+                } else if ( sin < 0 ) {
+                    sin = 0;
                 }
                 spaceship_material.emissive.setRGB( sin, sin, sin);
                 player.state.spawn_cooldown --;
