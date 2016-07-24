@@ -771,7 +771,7 @@ function render() {
         }
 
         function soundThrustCtl() {
-            if ( key.thrust || key.break || key.strafe.left || key.strafe.right) {
+            if ( (key.thrust || key.break || key.strafe.left || key.strafe.right) || (key.stall && player.velocity.magnitude != 0)) {
                 if (myGlobals.sound.clip.Thrust.volume < 1 ) {
                     myGlobals.sound.clip.Thrust.volume += 0.2;
                 }
