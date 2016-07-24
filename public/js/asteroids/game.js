@@ -101,7 +101,6 @@ var view = {
     height: 30.23
 }
 
-var rock_health = [1, 1, 1, 1, 1, 1];
 fireTimer = new THREE.Clock( true );
 firerate = player.weapon.blaster.firerate;
 
@@ -351,25 +350,13 @@ function render() {
             player.inertia.y = 0;
         }
 
-        // Collision: Rock/Projectile
-        CtlGame.rocks.forEach( function( rock, index ) {
-            CtlGame.projectiles.forEach( function( projectile, index ) {
-                if ( projectileRockCollision( projectile, rock )) {
-                    projectile.alive = false;
-                    if ( rock.time > 10) {
-                        rock.health--;
-                    }
-                }
-            });
-        });
-
         CtlGame.rocks.forEach( function( rock, index ) {
             // Collision: Rock/Projectile
             CtlGame.projectiles.forEach( function( projectile, index ) {
                 if ( projectileRockCollision( projectile, rock )) {
                     projectile.alive = false;
-                    if ( rock.time > 20) {
-                        rock.health--;
+                    if ( rock.time > 10) {
+                        rock.alive = false;
                     }
                 }
             });
@@ -896,7 +883,7 @@ function render() {
         rock.inertia.y = inertia_y;
         rock.type = type;
         rock.time = 0;
-        rock.health = rock_health[type-1];
+        rock.alive = true;
         CtlGame.rocks.push( rock );
         scene.add( rock );
     }
@@ -927,7 +914,7 @@ function render() {
 
             limitToView ( rock );
 
-            if ( rock.health <= 0 ) {
+            if ( !rock.alive ) {
                 kill.push( rock );
                 killRock( rock );
             } else {

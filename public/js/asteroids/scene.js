@@ -38,7 +38,6 @@ function rockRadius ( volume ) {
     return Math.pow((volume/Math.PI)*(3/4), 1/3);
 }
 
-var rock_health = [1, 1, 1, 1, 1, 1];
 var rock_radius = [
   rockRadius( 1 ),
   rockRadius( 3 ),
