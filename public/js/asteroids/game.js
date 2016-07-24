@@ -465,6 +465,7 @@ function render() {
 
         // Functions
         function playerDie() {
+            //CtlGame.explosions.parts.push(new ExplodeAnimation(spaceship.position.x, spaceship.position.y, 0x00BB00, 800, .1));
             player.state.player = EnumPlayerState.SPAWN;
             spaceship.position.x = 0;
             spaceship.position.y = 0;
