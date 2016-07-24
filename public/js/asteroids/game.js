@@ -462,9 +462,9 @@ function render() {
 
         // Functions
         function playerDie() {
-            CtlGame.explosions.push(new ExplodeAnimation(spaceship.position.x, spaceship.position.y, 0xBB0000, 1600, .8));
-            CtlGame.explosions.push(new ExplodeAnimation(spaceship.position.x, spaceship.position.y, 0xBBBB00, 1600, .4));
-            CtlGame.explosions.push(new ExplodeAnimation(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, .2));
+            CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0xBB0000, 1600, .8));
+            CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0xBBBB00, 1600, .4));
+            CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, .2));
             player.state.player = EnumPlayerState.SPAWN;
             spaceship.position.x = 0;
             spaceship.position.y = 0;
@@ -923,7 +923,7 @@ function render() {
         });
         CtlGame.rocks = tmp;
         kill.forEach( function( rock, index ) {
-            CtlGame.explosions.push(new ExplodeAnimation(rock.position.x, rock.position.y));
+            CtlGame.explosions.push(new ParticleExplosion(rock.position.x, rock.position.y));
             if ( rock.type >= 2 ) {
                 var inertia = rockInertia();
                 createRock( rock.type - 1, rock.position.x, rock.position.y, rock.inertia.x + inertia[0].x, rock.inertia.y + inertia[0].y);
@@ -978,7 +978,7 @@ function render() {
         scene.remove( object );
     }
 
-    function ExplodeAnimation(x,y, color = 0xBBBBBB, totalObjects = 400, movementSpeed = .8, objectSize = .06, sizeRandomness = 10000)
+    function ParticleExplosion(x,y, color = 0xBBBBBB, totalObjects = 400, movementSpeed = .8, objectSize = .06, sizeRandomness = 10000)
     {
         var geometry = new THREE.Geometry();
         this.dirs = [];
