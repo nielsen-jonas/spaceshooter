@@ -469,10 +469,10 @@ function render() {
             } else {
                 CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, 1.6, .12));
                 CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600));
-                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, .4, .12));
-                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, .2, .12));
-                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, .1, .12));
-                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, .06, .12));
+                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, .4, .12, 10000, null));
+                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, .2, .12, 10000, null));
+                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, .1, .12, 10000, null));
+                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, .06, .12, 10000, null));
             }
             player.state.player = EnumPlayerState.SPAWN;
             spaceship.position.x = 0;
@@ -857,7 +857,7 @@ function render() {
         var tmp = [];
         CtlGame.explosions.forEach( function( explosion, index ) {
             explosion.update();
-            if ( explosion.lifetime > 0 ) {
+            if ( explosion.lifetime > 0 || explosion.lifetime === null ) {
                 tmp.push( explosion );
             } else {
                 killObject( explosion.object );
@@ -996,7 +996,7 @@ function render() {
         scene.remove( object );
     }
 
-    function ParticleExplosion(x,y, color = 0xBBBBBB, totalObjects = 400, movementSpeed = .8, objectSize = .06, sizeRandomness = 10000)
+    function ParticleExplosion(x,y, color = 0xBBBBBB, totalObjects = 400, movementSpeed = .8, objectSize = .06, sizeRandomness = 10000, time = 2000)
     {
         var geometry = new THREE.Geometry();
         this.dirs = [];
@@ -1013,7 +1013,7 @@ function render() {
 
         var material = new THREE.PointsMaterial( { size: objectSize,  color: color });
         var particles = new THREE.Points( geometry, material );
-        this.lifetime = 2000;
+        this.lifetime = time;
         this.object = particles;
         this.status = true;
       
@@ -1024,7 +1024,9 @@ function render() {
         scene.add( this.object  ); 
       
         this.update = function() {
-            this.lifetime --;
+            if (this.lifetime) {
+                this.lifetime --;
+            }
             if (this.status == true) {
                 var pCount = totalObjects;
                 while(pCount--) {
