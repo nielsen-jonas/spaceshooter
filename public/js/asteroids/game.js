@@ -808,6 +808,9 @@ function render() {
         CtlGame.lives = 3;
         CtlGame.lives_pre = 3;
         CtlGame.rocks = [];
+        CtlGame.explosions.forEach( function (explosion, index ) {
+            scene.remove( explosion.object );
+        });
         CtlGame.explosions = [];
         player.state.player = EnumPlayerState.SPAWN;
         player.state.player_pre = EnumPlayerState.ALIVE;
@@ -848,7 +851,7 @@ function render() {
             if ( explosion.lifetime > 0 ) {
                 tmp.push( explosion );
             } else {
-                killObject( explosion );
+                killObject( explosion.object );
             }
         });
         CtlGame.explosions = tmp;
