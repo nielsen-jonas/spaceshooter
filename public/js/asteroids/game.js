@@ -25,7 +25,8 @@ var CtlGame = {
     score_pre: 0,
     lives: 3,
     lives_pre: 3,
-    rocks: []
+    rocks: [],
+    projectiles: []
 };
 
 var CtlRoom = {
@@ -96,7 +97,6 @@ var view = {
     height: 30.23
 }
 
-var projectiles = [];
 var rock_health = [1, 1, 1, 1, 1, 1];
 fireTimer = new THREE.Clock( true );
 firerate = player.weapon.blaster.firerate;
@@ -352,7 +352,7 @@ function render() {
 
         // Collision: Rock/Projectile
         CtlGame.rocks.forEach( function( rock, index ) {
-            projectiles.forEach( function( projectile, index ) {
+            CtlGame.projectiles.forEach( function( projectile, index ) {
                 if ( projectileRockCollision( projectile, rock )) {
                     projectile.alive = false;
                     if ( rock.time > 10) {
@@ -364,7 +364,7 @@ function render() {
 
         CtlGame.rocks.forEach( function( rock, index ) {
             // Collision: Rock/Projectile
-            projectiles.forEach( function( projectile, index ) {
+            CtlGame.projectiles.forEach( function( projectile, index ) {
                 if ( projectileRockCollision( projectile, rock )) {
                     projectile.alive = false;
                     if ( rock.time > 20) {
@@ -496,7 +496,7 @@ function render() {
             projectile.inertia.x = inertia_x / 380;
             projectile.inertia.y = inertia_y / 380;
             projectile.alive = true;
-            projectiles.push( projectile );
+            CtlGame.projectiles.push( projectile );
             scene.add( projectile );
         }
 
@@ -863,7 +863,7 @@ function render() {
 
     function projectileUpdate() {
         var tmp = [];
-        projectiles.forEach( function( projectile, index ) {
+        CtlGame.projectiles.forEach( function( projectile, index ) {
             // Update position
             projectile.position.x += projectile.inertia.x;
             projectile.position.y += projectile.inertia.y;
@@ -883,7 +883,7 @@ function render() {
                 killObject( projectile );
             }
         });
-        projectiles = tmp;
+        CtlGame.projectiles = tmp;
     }
 
     function createRock ( type = 3, origin_x = 0, origin_y = 0, inertia_x = 0, inertia_y = 0) {
