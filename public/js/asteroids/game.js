@@ -28,10 +28,7 @@ var CtlGame = {
     lives_pre: 3,
     rocks: [],
     projectiles: [],
-    explosions: {
-        dirs: [],
-        parts: []
-    }
+    explosions: []
 };
 
 var CtlRoom = {
@@ -465,7 +462,7 @@ function render() {
 
         // Functions
         function playerDie() {
-            //CtlGame.explosions.parts.push(new ExplodeAnimation(spaceship.position.x, spaceship.position.y, 0x00BB00, 800, .1));
+            CtlGame.explosions.push(new ExplodeAnimation(spaceship.position.x, spaceship.position.y, 0x00BB00, 800, .1));
             player.state.player = EnumPlayerState.SPAWN;
             spaceship.position.x = 0;
             spaceship.position.y = 0;
@@ -849,9 +846,9 @@ function render() {
     }
 
     function particleCtl() {
-        var pCount = CtlGame.explosions.parts.length;
+        var pCount = CtlGame.explosions.length;
         while(pCount--) {
-        CtlGame.explosions.parts[pCount].update();
+            CtlGame.explosions[pCount].update();
         }
     }
 
@@ -930,7 +927,7 @@ function render() {
         });
         CtlGame.rocks = tmp;
         kill.forEach( function( rock, index ) {
-            CtlGame.explosions.parts.push(new ExplodeAnimation(rock.position.x, rock.position.y));
+            CtlGame.explosions.push(new ExplodeAnimation(rock.position.x, rock.position.y));
             if ( rock.type >= 2 ) {
                 var inertia = rockInertia();
                 createRock( rock.type - 1, rock.position.x, rock.position.y, rock.inertia.x + inertia[0].x, rock.inertia.y + inertia[0].y);
@@ -988,6 +985,7 @@ function render() {
     function ExplodeAnimation(x,y, color = 0xBBBBBB, totalObjects = 400, movementSpeed = .8, objectSize = .06, sizeRandomness = 10000)
     {
         var geometry = new THREE.Geometry();
+        this.dirs = [];
       
         for (i = 0; i < totalObjects; i ++) { 
             var vertex = new THREE.Vector3();
@@ -996,7 +994,7 @@ function render() {
             vertex.z = 0;
       
             geometry.vertices.push( vertex );
-            CtlGame.explosions.dirs.push({x:(Math.random() * movementSpeed)-(movementSpeed/2),y:(Math.random() * movementSpeed)-(movementSpeed/2),z:(Math.random() * movementSpeed)-(movementSpeed/2)});
+            this.dirs.push({x:(Math.random() * movementSpeed)-(movementSpeed/2),y:(Math.random() * movementSpeed)-(movementSpeed/2),z:(Math.random() * movementSpeed)-(movementSpeed/2)});
         }
 
         var material = new THREE.PointsMaterial( { size: objectSize,  color: color });
@@ -1021,9 +1019,9 @@ function render() {
                 var pCount = totalObjects;
                 while(pCount--) {
                     var particle =  this.object.geometry.vertices[pCount]
-                    particle.y += CtlGame.explosions.dirs[pCount].y;
-                    particle.x += CtlGame.explosions.dirs[pCount].x;
-                    particle.z += CtlGame.explosions.dirs[pCount].z;
+                    particle.y += this.dirs[pCount].y;
+                    particle.x += this.dirs[pCount].x;
+                    particle.z += this.dirs[pCount].z;
                 }
                 
                 this.object.geometry.verticesNeedUpdate = true;
