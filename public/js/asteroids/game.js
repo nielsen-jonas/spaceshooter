@@ -10,16 +10,17 @@ var EnumPlayerState = {
 }
 
 var EnumGameRoom = {
-    MENU: 0,
-    GAME_ENTER: 1,
-    LEVEL_PLAYING: 2,
-    LEVEL_COMPLETE: 3,
-    LEVEL_PAUSE: 4,
-    GAME_OVER: 5
+    INIT: 0,
+    MENU: 1,
+    GAME_ENTER: 2,
+    LEVEL_PLAYING: 3,
+    LEVEL_COMPLETE: 4,
+    LEVEL_PAUSE: 5,
+    GAME_OVER: 6
 }
 
 var CtlGame = {
-    room: EnumGameRoom.MENU,
+    room: EnumGameRoom.INIT,
     level: 1,
     score: 0,
     score_pre: 0,
@@ -30,6 +31,9 @@ var CtlGame = {
 };
 
 var CtlRoom = {
+    init: {
+        state: EnumRoomState.CONSTRUCT
+    },
     menu: {
         state: EnumRoomState.CONSTRUCT
     },
@@ -102,7 +106,6 @@ fireTimer = new THREE.Clock( true );
 firerate = player.weapon.blaster.firerate;
 
 $( document ).ready( function () {
-    preRender();
     render();
 });
 
@@ -110,23 +113,13 @@ function myRand( min, max ) {
     return Math.floor(Math.random()*(max-min+1)+min); 
 }
 
-function preRender() {
-    myGlobals.thrustPlay = (function() {
-        var executed = false;
-        return function () {
-            if (!executed) {
-                executed = true;
-                // do something
-                myGlobals.sound.clip.Thrust.play( {loop: -1} );
-            }
-        };
-    })();
-}
-
 function render() {
     requestAnimationFrame( render );
     
     switch( CtlGame.room ) {
+        case EnumGameRoom.INIT:
+            init();
+            break;
         case EnumGameRoom.MENU:
             menu();
             break;
@@ -153,6 +146,11 @@ function render() {
     keypress.reset();
 
     return 0;
+
+    function init() {
+        CtlGame.room = EnumGameRoom.MENU;
+        return 0;
+    }
 
     function menu() {
         switch (CtlRoom.menu.state) {
@@ -190,6 +188,9 @@ function render() {
 
     function game_enter() {
         myGlobals.sound.stop();
+        myGlobals.sound.clip.Thrust.position = 0;
+        myGlobals.sound.clip.Thrust.play( {loop: -1} );
+        myGlobals.sound.clip.Thrust.volume = 0;
         sceneReset();
         stateResetGame();
         hudReset();
@@ -771,7 +772,6 @@ function render() {
 
         function soundThrustCtl() {
             if ( key.thrust || key.break || key.strafe.left || key.strafe.right) {
-                myGlobals.thrustPlay(); // Can only be called once
                 if (myGlobals.sound.clip.Thrust.volume < 1 ) {
                     myGlobals.sound.clip.Thrust.volume += 0.2;
                 }
