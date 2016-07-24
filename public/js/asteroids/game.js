@@ -1,4 +1,9 @@
-var EnumGameState = {
+var EnumRoomState = {
+    CONSTRUCT: 0,
+    LOOP: 1,
+    DESTRUCT: 2
+}
+var EnumGameRoom = {
     MENU: 0,
     GAME_ENTER: 1,
     LEVEL_PLAYING: 2,
@@ -20,7 +25,7 @@ var EnumPauseState = {
     UNPAUSE: 2
 }
 var CtlGame = {
-    state: EnumGameState.MENU,
+    room: EnumGameRoom.MENU,
     level: 1,
     score: 0,
     score_pre: 0,
@@ -125,23 +130,23 @@ function preRender() {
 function render() {
     requestAnimationFrame( render );
     
-    switch( CtlGame.state ) {
-        case EnumGameState.MENU:
+    switch( CtlGame.room ) {
+        case EnumGameRoom.MENU:
             menu();
             break;
-        case EnumGameState.GAME_ENTER:
+        case EnumGameRoom.GAME_ENTER:
             game_enter();
             break;
-        case EnumGameState.LEVEL_PLAYING:
+        case EnumGameRoom.LEVEL_PLAYING:
             level_playing();
             break;
-        case EnumGameState.LEVEL_COMPLETE:
+        case EnumGameRoom.LEVEL_COMPLETE:
             level_complete();
             break;
-        case EnumGameState.LEVEL_PAUSE:
+        case EnumGameRoom.LEVEL_PAUSE:
             level_pause();
             break;
-        case EnumGameState.GAME_OVER:
+        case EnumGameRoom.GAME_OVER:
             game_over();
             break;
     }
@@ -177,7 +182,7 @@ function render() {
         function menuLoop(){
             $( '#hud-menu-main-start' ).click(function(e){
                 e.preventDefault();
-                CtlGame.state = EnumGameState.GAME_ENTER;
+                CtlGame.room = EnumGameRoom.GAME_ENTER;
                 return false;
             });
             particleCtl();
@@ -200,12 +205,12 @@ function render() {
         $( '#hud-score' ).html(hudRenderScore( CtlGame.score ));
         $( '#hud-lives' ).html(hudRenderLives( CtlGame.lives ));
         createRock(5, 8, 0, .05, .02);
-        CtlGame.state = EnumGameState.LEVEL_PLAYING;
+        CtlGame.room = EnumGameRoom.LEVEL_PLAYING;
         return 0;
     }
     function level_complete() {
         createRock(5, 8, 0, .05, .02);
-        CtlGame.state = EnumGameState.LEVEL_PLAYING;
+        CtlGame.room = EnumGameRoom.LEVEL_PLAYING;
         player.state.player = EnumPlayerState.SPAWN;
         return 0;
     }
@@ -236,7 +241,7 @@ function render() {
                 e.preventDefault();
                 stateResetMenu();
                 stateResetGameOver();
-                CtlGame.state = EnumGameState.MENU;
+                CtlGame.room = EnumGameRoom.MENU;
                 return false;
             });
             particleCtl();
@@ -279,7 +284,7 @@ function render() {
         function pauseUnpause() {
             myGlobals.sound.unpause();
             stateResetPause();
-            CtlGame.state = EnumGameState.LEVEL_PLAYING;
+            CtlGame.room = EnumGameRoom.LEVEL_PLAYING;
             return 0;
         }
     }
@@ -287,12 +292,12 @@ function render() {
     function level_playing() {
         // Pause
         if ( keypress.pause ) {
-            CtlGame.state = EnumGameState.LEVEL_PAUSE;
+            CtlGame.room = EnumGameRoom.LEVEL_PAUSE;
             return 0;
         }
         // Level win condition
         if ( CtlGame.rocks.length == 0 ) {
-            CtlGame.state = EnumGameState.LEVEL_COMPLETE;
+            CtlGame.room = EnumGameRoom.LEVEL_COMPLETE;
             return 0;
         }
         // Update score
@@ -305,7 +310,7 @@ function render() {
             CtlGame.lives_pre = CtlGame.lives;
             $( '#hud-lives' ).html(hudRenderLives( CtlGame.lives ));
             if (CtlGame.lives <= 0) {
-                CtlGame.state = EnumGameState.GAME_OVER;
+                CtlGame.room = EnumGameRoom.GAME_OVER;
             }
         }
 
@@ -809,7 +814,7 @@ function render() {
     }
 
     function stateResetGame() {
-        CtlGame.state = EnumGameState.MENU;
+        CtlGame.room = EnumGameRoom.MENU;
         CtlGame.level = 1;
         CtlGame.score = 0;
         CtlGame.score_pre = 0;
