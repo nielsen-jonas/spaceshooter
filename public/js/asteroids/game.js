@@ -84,12 +84,12 @@ var player = {
     },
     passive_deceleration: {
         break: 0.1,
-        rotation: 0.1
+        rotation: 0.01
     },
     weapon: {
         blaster: {
             firerate: .18,
-            recoil: 1.8,
+            recoil: 0,
             overheat: 0,
             cooldown: 0
         }
