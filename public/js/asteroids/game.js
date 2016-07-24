@@ -179,7 +179,7 @@ function render() {
                 CtlGame.room = EnumGameRoom.GAME_ENTER;
                 return false;
             });
-            particleCtl();
+            particleExplosionUpdate();
             projectileUpdate();
             rockUpdate();
             return 0;
@@ -241,7 +241,7 @@ function render() {
                 CtlGame.room = EnumGameRoom.MENU;
                 return false;
             });
-            particleCtl();
+            particleExplosionUpdate();
             projectileUpdate();
             rockUpdate();
             return 0;
@@ -340,8 +340,8 @@ function render() {
         // Thrust volume control based on key input
         soundThrustCtl();
 
-        // Particle explosion control
-        particleCtl();
+        // Particle explosion update
+        particleExplosionUpdate();
 
         // TODO: Find out why inertia variables arent arent still when not moving
         if (Math.abs(player.inertia.x) < .1) {
@@ -841,11 +841,17 @@ function render() {
         return 0;
     }
 
-    function particleCtl() {
-        var pCount = CtlGame.explosions.length;
-        while(pCount--) {
-            CtlGame.explosions[pCount].update();
-        }
+    function particleExplosionUpdate() {
+        var tmp = [];
+        CtlGame.explosions.forEach( function( explosion, index ) {
+            explosion.update();
+            if ( explosion.lifetime > 0 ) {
+                tmp.push( explosion );
+            } else {
+                killObject( explosion );
+            }
+        });
+        CtlGame.explosions = tmp;
     }
 
     function projectileUpdate() {
@@ -1007,10 +1013,6 @@ function render() {
       
         this.update = function() {
             this.lifetime --;
-            if ( this.lifetime <= 0 ) {
-                scene.remove(this.object);
-            }
-        
             if (this.status == true) {
                 var pCount = totalObjects;
                 while(pCount--) {
