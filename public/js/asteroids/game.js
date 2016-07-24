@@ -27,7 +27,11 @@ var CtlGame = {
     lives: 3,
     lives_pre: 3,
     rocks: [],
-    projectiles: []
+    projectiles: [],
+    explosions: {
+        dirs: [],
+        parts: []
+    }
 };
 
 var CtlRoom = {
@@ -808,6 +812,7 @@ function render() {
         player.state.player_pre = EnumPlayerState.ALIVE;
         player.state.spawn_cooldown = player.spawn_cooldown;
         player.inertia.rotation = 0;
+
     }
 
     function stateResetGameOver() {
@@ -843,9 +848,9 @@ function render() {
     }
 
     function particleCtl() {
-        var pCount = parts.length;
+        var pCount = CtlGame.explosions.parts.length;
         while(pCount--) {
-        parts[pCount].update();
+        CtlGame.explosions.parts[pCount].update();
         }
     }
 
@@ -924,7 +929,7 @@ function render() {
         });
         CtlGame.rocks = tmp;
         kill.forEach( function( rock, index ) {
-            parts.push(new ExplodeAnimation(rock.position.x, rock.position.y));
+            CtlGame.explosions.parts.push(new ExplodeAnimation(rock.position.x, rock.position.y));
             if ( rock.type >= 2 ) {
                 var inertia = rockInertia();
                 createRock( rock.type - 1, rock.position.x, rock.position.y, rock.inertia.x + inertia[0].x, rock.inertia.y + inertia[0].y);
@@ -977,5 +982,51 @@ function render() {
 
     function killObject ( object ) {
         scene.remove( object );
+    }
+
+    function ExplodeAnimation(x,y, color = 0xBBBBBB, totalObjects = 400, movementSpeed = .8, objectSize = .06, sizeRandomness = 10000)
+    {
+        var geometry = new THREE.Geometry();
+      
+        for (i = 0; i < totalObjects; i ++) { 
+            var vertex = new THREE.Vector3();
+            vertex.x = x;
+            vertex.y = y;
+            vertex.z = 0;
+      
+            geometry.vertices.push( vertex );
+            CtlGame.explosions.dirs.push({x:(Math.random() * movementSpeed)-(movementSpeed/2),y:(Math.random() * movementSpeed)-(movementSpeed/2),z:(Math.random() * movementSpeed)-(movementSpeed/2)});
+        }
+
+        var material = new THREE.PointsMaterial( { size: objectSize,  color: color });
+        var particles = new THREE.Points( geometry, material );
+        this.lifetime = 2000;
+        this.object = particles;
+        this.status = true;
+      
+        this.xDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+        this.yDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+        this.zDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+      
+        scene.add( this.object  ); 
+      
+        this.update = function() {
+            this.lifetime --;
+            if ( this.lifetime <= 0 ) {
+                scene.remove(this.object);
+            }
+        
+            if (this.status == true) {
+                var pCount = totalObjects;
+                while(pCount--) {
+                    var particle =  this.object.geometry.vertices[pCount]
+                    particle.y += CtlGame.explosions.dirs[pCount].y;
+                    particle.x += CtlGame.explosions.dirs[pCount].x;
+                    particle.z += CtlGame.explosions.dirs[pCount].z;
+                }
+                
+                this.object.geometry.verticesNeedUpdate = true;
+            }
+        }
     }
 }

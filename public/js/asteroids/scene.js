@@ -147,8 +147,6 @@ var objectSize = .06;
 var sizeRandomness = 10000;*/
 //var colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
 /////////////////////////////////
-var dirs = [];
-var parts = [];
 
 function ExplodeAnimation(x,y, color = 0xBBBBBB, totalObjects = 400, movementSpeed = .8, objectSize = .06, sizeRandomness = 10000)
 {
