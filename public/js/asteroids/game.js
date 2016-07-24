@@ -3,6 +3,12 @@ var EnumRoomState = {
     LOOP: 1,
     DESTRUCT: 2
 }
+
+var EnumPlayerState = {
+    SPAWN: 0,
+    ALIVE: 1
+}
+
 var EnumGameRoom = {
     MENU: 0,
     GAME_ENTER: 1,
@@ -11,19 +17,7 @@ var EnumGameRoom = {
     LEVEL_PAUSE: 4,
     GAME_OVER: 5
 }
-var EnumMenuState = {
-    CONSTRUCT: 0,
-    LOOP: 1
-}
-var EnumGameOverState = {
-    CONSTRUCT: 0,
-    LOOP: 1
-}
-var EnumPauseState = {
-    CONSTRUCT: 0,
-    LOOP: 1,
-    UNPAUSE: 2
-}
+
 var CtlGame = {
     room: EnumGameRoom.MENU,
     level: 1,
@@ -34,18 +28,13 @@ var CtlGame = {
     rocks: []
 };
 var CtlMenu = {
-    state: EnumMenuState.CONSTRUCT
+    state: EnumRoomState.CONSTRUCT
 }
 var CtlGameOver = {
-    state: EnumGameOverState.CONSTRUCT
+    state: EnumRoomState.CONSTRUCT
 }
-CtlPause = {
-    state: EnumPauseState.CONSTRUCT
-}
-
-var EnumPlayerState = {
-    SPAWN: 0,
-    ALIVE: 1
+var CtlPause = {
+    state: EnumRoomState.CONSTRUCT
 }
 
 // Player properties
@@ -160,10 +149,10 @@ function render() {
 
     function menu() {
         switch (CtlMenu.state) {
-            case EnumMenuState.CONSTRUCT:
+            case EnumRoomState.CONSTRUCT:
                 menuConstruct();
                 break;
-            case EnumMenuState.LOOP:
+            case EnumRoomState.LOOP:
                 menuLoop();
                 break;
         }
@@ -176,7 +165,7 @@ function render() {
             if ( !$('#hud-menu-main').is( ':visible' )) {
                 $( '#hud-menu-main' ).show( 600 );
             }
-            CtlMenu.state = EnumMenuState.LOOP;
+            CtlMenu.state = EnumRoomState.LOOP;
             return 0;
         }
         function menuLoop(){
@@ -216,10 +205,10 @@ function render() {
     }
     function game_over() {
         switch ( CtlGameOver.state ) {
-            case EnumGameOverState.CONSTRUCT:
+            case EnumRoomState.CONSTRUCT:
                 gameOverConstruct();
                 break;
-            case EnumGameOverState.LOOP:
+            case EnumRoomState.LOOP:
                 gameOverLoop();
                 break;
         }
@@ -233,7 +222,7 @@ function render() {
             scene.remove( spaceship );
             myGlobals.sound.stop();
             myGlobals.sound.clip.GameOver.play( { loop: -1 } );
-            CtlGameOver.state = EnumGameOverState.LOOP;
+            CtlGameOver.state = EnumRoomState.LOOP;
             return 0;
         }
         function gameOverLoop() {
@@ -254,13 +243,13 @@ function render() {
     function level_pause() {
 
         switch ( CtlPause.state ) {
-            case EnumPauseState.CONSTRUCT:
+            case EnumRoomState.CONSTRUCT:
                 pauseConstruct();
                 break;
-            case EnumPauseState.LOOP:
+            case EnumRoomState.LOOP:
                 pauseLoop();
                 break;
-            case EnumPauseState.UNPAUSE:
+            case EnumRoomState.DESTRUCT:
                 pauseUnpause();
                 break;
         }
@@ -269,14 +258,14 @@ function render() {
 
         function pauseConstruct() {
             myGlobals.sound.pause();
-            CtlPause.state = EnumPauseState.LOOP;
+            CtlPause.state = EnumRoomState.LOOP;
             return 0;
         }
 
         function pauseLoop() {
             // Unpause
             if ( keypress.pause ) {
-                CtlPause.state = EnumPauseState.UNPAUSE;
+                CtlPause.state = EnumRoomState.DESTRUCT;
             }
             return 0;
         }
@@ -827,14 +816,14 @@ function render() {
     }
 
     function stateResetGameOver() {
-        CtlGameOver.state = EnumGameOverState.CONSTRUCT;
+        CtlGameOver.state = EnumRoomState.CONSTRUCT;
     }
 
     function stateResetMenu() {
-        CtlMenu.state = EnumMenuState.CONSTRUCT;
+        CtlMenu.state = EnumRoomState.CONSTRUCT;
     }
     function stateResetPause() {
-        CtlPause.state = EnumPauseState.CONSTRUCT;
+        CtlPause.state = EnumRoomState.CONSTRUCT;
     }
 
     function hudReset() {
