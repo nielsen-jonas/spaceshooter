@@ -76,7 +76,7 @@ var player = {
         thrust: 1.5,
         strafe: 1.5,
         break: 1.5,
-        rotation: 0.1
+        rotation: 0.05
     },
     max: {
         speed: 200,
