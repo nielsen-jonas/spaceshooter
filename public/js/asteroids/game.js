@@ -27,14 +27,21 @@ var CtlGame = {
     lives_pre: 3,
     rocks: []
 };
-var CtlMenu = {
-    state: EnumRoomState.CONSTRUCT
-}
-var CtlGameOver = {
-    state: EnumRoomState.CONSTRUCT
-}
-var CtlPause = {
-    state: EnumRoomState.CONSTRUCT
+
+var CtlRoom = {
+    menu: {
+        state: EnumRoomState.CONSTRUCT
+    },
+    game: {
+        state: EnumRoomState.CONSTRUCT
+    },
+    game_over: {
+        state: EnumRoomState.CONSTRUCT
+    },
+    pause: {
+        state: EnumRoomState.CONSTRUCT
+    }
+
 }
 
 // Player properties
@@ -148,7 +155,7 @@ function render() {
     return 0;
 
     function menu() {
-        switch (CtlMenu.state) {
+        switch (CtlRoom.menu.state) {
             case EnumRoomState.CONSTRUCT:
                 menuConstruct();
                 break;
@@ -165,7 +172,7 @@ function render() {
             if ( !$('#hud-menu-main').is( ':visible' )) {
                 $( '#hud-menu-main' ).show( 600 );
             }
-            CtlMenu.state = EnumRoomState.LOOP;
+            CtlRoom.menu.state = EnumRoomState.LOOP;
             return 0;
         }
         function menuLoop(){
@@ -204,7 +211,7 @@ function render() {
         return 0;
     }
     function game_over() {
-        switch ( CtlGameOver.state ) {
+        switch ( CtlRoom.game_over.state ) {
             case EnumRoomState.CONSTRUCT:
                 gameOverConstruct();
                 break;
@@ -222,7 +229,7 @@ function render() {
             scene.remove( spaceship );
             myGlobals.sound.stop();
             myGlobals.sound.clip.GameOver.play( { loop: -1 } );
-            CtlGameOver.state = EnumRoomState.LOOP;
+            CtlRoom.game_over.state = EnumRoomState.LOOP;
             return 0;
         }
         function gameOverLoop() {
@@ -242,7 +249,7 @@ function render() {
 
     function level_pause() {
 
-        switch ( CtlPause.state ) {
+        switch ( CtlRoom.pause.state ) {
             case EnumRoomState.CONSTRUCT:
                 pauseConstruct();
                 break;
@@ -258,14 +265,14 @@ function render() {
 
         function pauseConstruct() {
             myGlobals.sound.pause();
-            CtlPause.state = EnumRoomState.LOOP;
+            CtlRoom.pause.state = EnumRoomState.LOOP;
             return 0;
         }
 
         function pauseLoop() {
             // Unpause
             if ( keypress.pause ) {
-                CtlPause.state = EnumRoomState.DESTRUCT;
+                CtlRoom.pause.state = EnumRoomState.DESTRUCT;
             }
             return 0;
         }
@@ -816,14 +823,14 @@ function render() {
     }
 
     function stateResetGameOver() {
-        CtlGameOver.state = EnumRoomState.CONSTRUCT;
+        CtlRoom.game_over.state = EnumRoomState.CONSTRUCT;
     }
 
     function stateResetMenu() {
-        CtlMenu.state = EnumRoomState.CONSTRUCT;
+        CtlRoom.menu.state = EnumRoomState.CONSTRUCT;
     }
     function stateResetPause() {
-        CtlPause.state = EnumRoomState.CONSTRUCT;
+        CtlRoom.pause.state = EnumRoomState.CONSTRUCT;
     }
 
     function hudReset() {
