@@ -462,7 +462,9 @@ function render() {
 
         // Functions
         function playerDie() {
-            CtlGame.explosions.push(new ExplodeAnimation(spaceship.position.x, spaceship.position.y, 0x00BB00, 800, .1));
+            CtlGame.explosions.push(new ExplodeAnimation(spaceship.position.x, spaceship.position.y, 0xBB0000, 1600, .8));
+            CtlGame.explosions.push(new ExplodeAnimation(spaceship.position.x, spaceship.position.y, 0xBBBB00, 1600, .4));
+            CtlGame.explosions.push(new ExplodeAnimation(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, .2));
             player.state.player = EnumPlayerState.SPAWN;
             spaceship.position.x = 0;
             spaceship.position.y = 0;
@@ -806,6 +808,7 @@ function render() {
         CtlGame.lives = 3;
         CtlGame.lives_pre = 3;
         CtlGame.rocks = [];
+        CtlGame.explosions = [];
         player.state.player = EnumPlayerState.SPAWN;
         player.state.player_pre = EnumPlayerState.ALIVE;
         player.state.spawn_cooldown = player.spawn_cooldown;
