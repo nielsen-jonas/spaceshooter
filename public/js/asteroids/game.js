@@ -462,9 +462,18 @@ function render() {
 
         // Functions
         function playerDie() {
-            CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0xBB0000, 1600, .8));
-            CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0xBBBB00, 1600, .4));
-            CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, .2));
+            if ( CtlGame.lives > 2 ) {
+                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0xEE0000, 1600, 1.6, .12));
+            } else if ( CtlGame.lives == 2 ) {
+                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0xEEEE00, 1600, 1.6, .12));
+            } else {
+                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, 1.6, .12));
+                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600));
+                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, .4, .12));
+                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, .2, .12));
+                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, .1, .12));
+                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, .06, .12));
+            }
             player.state.player = EnumPlayerState.SPAWN;
             spaceship.position.x = 0;
             spaceship.position.y = 0;
