@@ -807,6 +807,7 @@ function render() {
         player.state.player = EnumPlayerState.SPAWN;
         player.state.player_pre = EnumPlayerState.ALIVE;
         player.state.spawn_cooldown = player.spawn_cooldown;
+        player.inertia.rotation = 0;
     }
 
     function stateResetGameOver() {
