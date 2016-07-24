@@ -841,13 +841,6 @@ function render() {
         return 0;
     }
 
-    function soundUnpause() {
-        /*sounds.forEach( function( sound, index ) {
-            sound.pause = false;
-        });*/
-        return 0;
-    }
-
     function particleCtl() {
         var pCount = CtlGame.explosions.length;
         while(pCount--) {
