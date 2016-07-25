@@ -196,7 +196,19 @@ function render() {
 
         $( '#hud-score' ).html(hudRenderScore( CtlGame.score ));
         $( '#hud-lives' ).html(hudRenderLives( CtlGame.lives ));
-        createRock(5, 8, 0, .05, .02);
+        var inertia = rockInertia();
+        createRock(
+            5,
+            8,
+            0,
+            inertia.x,
+            inertia.y,
+            [
+                inertia.x*.1,
+                inertia.y*.1,
+                inertia.z*.1
+            ]
+        );
         CtlGame.room = EnumGameRoom.LEVEL_PLAYING;
         return 0;
     }
@@ -877,7 +889,7 @@ function render() {
         CtlGame.projectiles = tmp;
     }
 
-    function createRock ( type = 3, origin_x = 0, origin_y = 0, inertia_x = 0, inertia_y = 0) {
+    function createRock ( type = 3, origin_x = 0, origin_y = 0, inertia_x = 0, inertia_y = 0, inertia_rotation = [ 0, 0, 0 ]) {
         var rock_geometry = new THREE.SphereGeometry( rock_radius[type-1] );
         var rock = new THREE.Mesh ( rock_geometry, rock_material );
         rock.position.x = origin_x;
@@ -888,6 +900,7 @@ function render() {
         rock.type = type;
         rock.time = 0;
         rock.alive = true;
+        rock.inertia.rotation = inertia_rotation;
         CtlGame.rocks.push( rock );
         scene.add( rock );
     }
@@ -915,6 +928,9 @@ function render() {
             rock.time++;
             rock.position.x += rock.inertia.x;
             rock.position.y += rock.inertia.y;
+            rock.rotateX( rock.inertia.rotation[0] );
+            rock.rotateY( rock.inertia.rotation[1] );
+            rock.rotateZ( rock.inertia.rotation[2] );
 
             limitToView ( rock );
 
@@ -930,8 +946,26 @@ function render() {
             CtlGame.explosions.push(new ParticleExplosion(rock.position.x, rock.position.y));
             if ( rock.type >= 2 ) {
                 var inertia = rockInertia();
-                createRock( rock.type - 1, rock.position.x, rock.position.y, rock.inertia.x + inertia[0].x, rock.inertia.y + inertia[0].y);
-                createRock( rock.type - 1, rock.position.x, rock.position.y, rock.inertia.x + inertia[1].x, rock.inertia.y + inertia[1].y);
+                createRock(
+                    rock.type - 1,
+                    rock.position.x,
+                    rock.position.y,
+                    rock.inertia.x + inertia.x,
+                    rock.inertia.y + inertia.y,
+                    [rock.inertia.rotation[0] + inertia.x*.1,
+                    rock.inertia.rotation[1] + inertia.y*.1,
+                    rock.inertia.rotation[2] + inertia.z*.1]
+                );
+                createRock(
+                    rock.type - 1,
+                    rock.position.x,
+                    rock.position.y,
+                    rock.inertia.x - inertia.x,
+                    rock.inertia.y - inertia.y,
+                    [rock.inertia.rotation[0] - inertia.x*.1,
+                    rock.inertia.rotation[1] - inertia.y*.1,
+                    rock.inertia.rotation[2] - inertia.z*.1]
+                );
             }
         });
     }
@@ -940,19 +974,11 @@ function render() {
         function rockInertiaRand() {
             return .002 * myRand( -80, 80);
         };
-        return [
-            {
+        return {
                 x: rockInertiaRand(),
-                y: rockInertiaRand()
-            },
-            {
-                x: rockInertiaRand(),
-                y: rockInertiaRand()
-            },
-            {
-                x: rockInertiaRand(),
-                y: rockInertiaRand()
-            }]
+                y: rockInertiaRand(),
+                z: rockInertiaRand()
+            }
     }
 
     function killRock ( rock ) {
