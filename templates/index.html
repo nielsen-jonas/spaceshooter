@@ -1,10 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>Hello World!</title>
-    </head>
-    <body>
-        <h1>Hello {{ name }}!</h1>
-    </body>
-</html>
+{% extends "layout.html" %}
+
+{% block title %}WebGL Test{% endblock %}
+{% block head %}
+    {{ parent() }}
+    <style>
+        body {
+            text-align: center;
+            font-family: 'Oswald';
+        }
+        #controls {
+        	width: 960px;
+        	margin: 0 auto;
+        	text-align: left;
+        }
+        .control {
+            float:left;
+            margin-right: 6rem;
+        }
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            font-width: 2rem;
+            letter-spacing: 1em;
+        }
+        
+    </style>
+{% endblock %}
+{% block links %}
+    <link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+{% endblock %}
+{% block content %}
+    <h1>ASTEROIDS</h1>
+    <iframe id="game" src="{{ website.url ~ '/src' }}" width="960" height="540" scrolling="no" frameborder="0"></iframe>
+    <section id="controls">
+        <h2>Controls</h2>
+        <div>
+            <div class="control">
+                <h3>Primary</h3>
+                <dl>
+                    <dt>Thrust</dt>
+                    <dd>Up, Down</dd>
+                    <dt>Rotate</dt>
+                    <dd>S, F</dd>
+                    <dt>Blaster</dt>
+                    <dd>Space</dd>
+                    <dt>Pause</dt>
+                    <dd>P</dd>
+                </dl>
+            </div>
+            <div class="control">
+                <h3>Advanced</h3>
+                <dl>
+                    <dt>Strafe</dt>
+                    <dd>Left, Right</dd>
+                    <dt>Equalize</dt>
+                    <dd>E, D</dd>
+                    <dt>Stall</dt>
+                    <dd>W</dd>
+                    <dt>Hyperspace</dt>
+                    <dd>Enter</dd>
+                </dl>
+            </div>
+        <div>
+    </section>
+{% endblock %}
+{% block scripts %}
+    <script>
+        $( '#game' )[0].contentWindow.focus();
+        $( document ).mouseup(function() {
+            $( '#game' )[0].contentWindow.focus();
+        });
+        $( document ).mousedown(function() {
+            $( '#game' )[0].contentWindow.focus();
+        });
+    </script>
+{% endblock %}
