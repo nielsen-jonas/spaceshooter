@@ -86,7 +86,7 @@ var player = {
     },
     passive_deceleration: {
         break: 0.1,
-        rotation: 0.01
+        rotation: 0.02
     },
     weapon: {
         blaster: {
