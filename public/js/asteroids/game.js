@@ -643,7 +643,7 @@ function render() {
                     // Rotate left
                     var R = (V*V)/(DL);
                     if ( R < Mid) {
-                        playerYawLeft( player.acceleration.rotation * 4 );
+                        playerYawLeft( player.acceleration.rotation * 2 );
                     } else {
                         playerYawRight( player.acceleration.rotation );
                     }
@@ -651,7 +651,7 @@ function render() {
                     // Rotate right
                     var R = (V*V)/(DR);
                     if ( R < Mid) {
-                        playerYawRight( player.acceleration.rotation * 4 );
+                        playerYawRight( player.acceleration.rotation * 2 );
                     } else {
                         playerYawLeft( player.acceleration.rotation );
                     }
