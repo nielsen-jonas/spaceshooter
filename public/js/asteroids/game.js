@@ -260,6 +260,7 @@ function render() {
         return 0;
 
         function pauseConstruct() {
+            $( '#hud-pause-container' ).show();
             myGlobals.sound.pause();
             CtlRoom.pause.state = EnumRoomState.LOOP;
             return 0;
@@ -274,6 +275,7 @@ function render() {
         }
 
         function pauseUnpause() {
+            $( '#hud-pause-container' ).hide();
             myGlobals.sound.unpause();
             stateResetPause();
             CtlGame.room = EnumGameRoom.LEVEL_PLAYING;
