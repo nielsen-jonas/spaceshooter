@@ -24,6 +24,7 @@ var CtlGame = {
     level: 1,
     score: 0,
     score_pre: 0,
+    lives_score: 0,
     lives: 3,
     lives_pre: 3,
     rocks: [],
@@ -162,9 +163,7 @@ function render() {
             myGlobals.sound.stop();
             myGlobals.sound.clip.Menu.play( { loop: -1 } );
             hudReset();
-            if ( !$('#hud-menu-main').is( ':visible' )) {
-                $( '#hud-menu-main' ).show( 600 );
-            }
+            $( '#hud-menu-main' ).show( 600 );
             CtlRoom.menu.state = EnumRoomState.LOOP;
             return 0;
         }
@@ -197,10 +196,11 @@ function render() {
         $( '#hud-score' ).html(hudRenderScore( CtlGame.score ));
         $( '#hud-lives' ).html(hudRenderLives( CtlGame.lives ));
         var inertia = rockInertia();
+        var rand_pos = randomViewPosition();
         createRock(
-            5,
-            8,
-            0,
+            3,
+            rand_pos.x,
+            rand_pos.y,
             inertia.x,
             inertia.y,
             [
@@ -213,8 +213,24 @@ function render() {
         return 0;
     }
     function level_complete() {
-        createRock(5, 8, 0, .05, .02);
+        for (var i = 0; i <= CtlGame.level; i++) {
+            var inertia = rockInertia();
+            var rand_pos = randomViewPosition();
+            createRock(
+                3,
+                rand_pos.x,
+                rand_pos.y,
+                inertia.x,
+                inertia.y,
+                [
+                    inertia.x*.1,
+                    inertia.y*.1,
+                    inertia.z*.1
+                ]
+            );
+        }
         CtlGame.room = EnumGameRoom.LEVEL_PLAYING;
+        CtlGame.level ++;
         player.state.player = EnumPlayerState.SPAWN;
         return 0;
     }
@@ -308,8 +324,14 @@ function render() {
         }
         // Update score
         if (CtlGame.score_pre != CtlGame.score) {
+            CtlGame.lives_score += CtlGame.score - CtlGame.score_pre;
             CtlGame.score_pre = CtlGame.score;
             $( '#hud-score' ).html(hudRenderScore( CtlGame.score ));
+            // Extra life
+            if ( CtlGame.lives_score >= 10000) {
+                CtlGame.lives_score -= 10000;
+                CtlGame.lives ++;
+            }
         }
         // Update lives
         if (CtlGame.lives_pre != CtlGame.lives) {
@@ -567,8 +589,9 @@ function render() {
         function playerHyperspaceOut() {
             if ( spaceship.position.z < (-200)) {
                 spaceship.position.z = 50;
-                spaceship.position.x = (0 - (view.width*.8) / 2) + myRand(0, (view.width*.8));
-                spaceship.position.y = (0 - (view.height*.8) / 2) + myRand(0, (view.height*.8));
+                var rand_pos = randomViewPosition();
+                spaceship.position.x = rand_pos.x;
+                spaceship.position.y = rand_pos.y;
                 player.hyperspace.out = false;
                 player.hyperspace.in = true;
             } else {
@@ -814,6 +837,7 @@ function render() {
         CtlGame.score_pre = 0;
         CtlGame.lives = 3;
         CtlGame.lives_pre = 3;
+        CtlGame.lives_score = 0;
         CtlGame.rocks = [];
         CtlGame.explosions.forEach( function (explosion, index ) {
             scene.remove( explosion.object );
@@ -917,6 +941,13 @@ function render() {
         }
         if (object.position.y > (view.height / 2)) {
             object.position.y -= view.height;
+        }
+    }
+
+    function randomViewPosition () {
+        return {
+            x: (0 - (view.width*.8) / 2) + myRand(0, (view.width*.8)),
+            y: (0 - (view.height*.8) / 2) + myRand(0, (view.height*.8))
         }
     }
 
