@@ -1,6 +1,6 @@
 // Populating the scene
 var geometry = new THREE.PlaneGeometry( 960, 540);
-var texture = new THREE.TextureLoader().load('http://slim/img/game_bg_a.png')
+var texture = new THREE.TextureLoader().load('https://exhibit.empyrealworks.com/asteroids/public/img/game_bg_a.png')
 var material = new THREE.MeshBasicMaterial({
     map: texture,
     fog: false
@@ -8,14 +8,14 @@ var material = new THREE.MeshBasicMaterial({
 var background = new THREE.Mesh( geometry, material );
 scene.add( background );
 
-var textureFlare = new THREE.TextureLoader().load( "http://slim/img/lensflare.png" );
+var textureFlare = new THREE.TextureLoader().load( "https://exhibit.empyrealworks.com/asteroids/public/img/lensflare.png" );
 var flareColor = new THREE.Color( 0xffffff );
 var position = new THREE.Vector3(0,0,0);
 var star = addLensFlare( textureFlare, flareColor, position, 1.5, false);
 scene.add( star );
 
 var spaceship_geometry = new THREE.CylinderGeometry( .2, .6, 1.4, 16 );
-var spaceship_texture = new THREE.TextureLoader().load('http://slim/img/rasta.jpg');
+var spaceship_texture = new THREE.TextureLoader().load('https://exhibit.empyrealworks.com/asteroids/public/img/rasta.jpg');
 var spaceship_material = new THREE.MeshLambertMaterial({
     map: spaceship_texture
 });
@@ -29,7 +29,7 @@ scene.add( ambientLight );
 scene.add( directionalLight );
 
 // Rocks
-var rock_texture = new THREE.TextureLoader().load('http://slim/img/rock.jpg');
+var rock_texture = new THREE.TextureLoader().load('https://exhibit.empyrealworks.com/asteroids/public/img/rock.jpg');
 var rock_material = new THREE.MeshLambertMaterial({
     map: rock_texture
 });
@@ -93,7 +93,7 @@ function addLensFlare( textureFlare, flareColor, position, size, overrideImage){
 myGlobals.sound = {
     clip: {},
     asset: {
-        path: 'http://slim/sound/jonas/',
+        path: 'https://exhibit.empyrealworks.com/asteroids/public/sound/jonas/',
         files: [
             { src: 'fire.wav', id: 'Blaster'},
             { src: 'thrust.wav', id: 'Thrust'},

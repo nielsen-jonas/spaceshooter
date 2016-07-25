@@ -196,6 +196,9 @@ function render() {
         $( '#hud-score' ).html(hudRenderScore( CtlGame.score ));
         $( '#hud-lives' ).html(hudRenderLives( CtlGame.lives ));
         var inertia = rockInertia();
+        inertia.x *= .22;
+        inertia.y *= .22;
+        inertia.z *= .22;
         var rand_pos = randomViewPosition();
         createRock(
             3,
@@ -215,6 +218,9 @@ function render() {
     function level_complete() {
         for (var i = 0; i <= CtlGame.level; i++) {
             var inertia = rockInertia();
+            inertia.x *= .22;
+            inertia.y *= .22;
+            inertia.z *= .22;
             var rand_pos = randomViewPosition();
             createRock(
                 3,
@@ -1039,7 +1045,7 @@ function render() {
         scene.remove( object );
     }
 
-    function ParticleExplosion(x,y, color = 0xBBBBBB, totalObjects = 400, movementSpeed = .8, objectSize = .06, sizeRandomness = 10000, time = 2000)
+    function ParticleExplosion(x,y, color = 0xBBBBBB, totalObjects = 400, movementSpeed = .8, objectSize = .06, sizeRandomness = 10000, time = 1000)
     {
         var geometry = new THREE.Geometry();
         this.dirs = [];

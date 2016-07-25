@@ -11,7 +11,7 @@ $app->get('/', function ($request, $response, $args) use ($app) {
 	]);
 });
 
-$app->get('/src', function ($request, $response, $args) use ($app) {
+$app->get('/src/', function ($request, $response, $args) use ($app) {
 	// Log
 	$this->logger->info("Asteroids src '/src' route");
 

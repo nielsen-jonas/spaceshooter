@@ -9,32 +9,32 @@ if (PHP_SAPI == 'cli-server') {
     }
 }
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 session_start();
 
 // Instantiate the app
-$settings = require __DIR__ . '/../src/settings.php';
+$settings = require __DIR__ . '/src/settings.php';
 $app = new \Slim\App($settings);
 
 // Site configuration
 $app->website = [
-    'name' => 'Slim',
-    'url' => 'http://slim'
+    'name' => 'Asteroids',
+    'url' => 'https://exhibit.empyrealworks.com/asteroids/'
 ];
 $app->resource = [
-    'css' => $app->website['url'] . '/css/',
-    'js' => $app->website['url'] . '/js/'
+    'css' => $app->website['url'] . 'public/css/',
+    'js' => $app->website['url'] . 'public/js/'
 ];
 
 // Set up dependencies
-require __DIR__ . '/../src/dependencies.php';
+require __DIR__ . '/src/dependencies.php';
 
 // Register middleware
-require __DIR__ . '/../src/middleware.php';
+require __DIR__ . '/src/middleware.php';
 
 // Register routes
-require __DIR__ . '/../src/routes.php';
+require __DIR__ . '/src/routes.php';
 
 // Run app
 $app->run();
