@@ -89,7 +89,7 @@ var player = {
     },
     weapon: {
         blaster: {
-            firerate: .18,
+            firerate: .16,
             recoil: 0,
             overheat: 0,
             cooldown: 0
@@ -356,7 +356,7 @@ function render() {
             CtlGame.projectiles.forEach( function( projectile, index ) {
                 if ( projectileRockCollision( projectile, rock )) {
                     projectile.alive = false;
-                    if ( rock.time > 10) {
+                    if ( rock.time > 4) {
                         rock.alive = false;
                     }
                 }
