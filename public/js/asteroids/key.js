@@ -1,8 +1,10 @@
 // Controls
 var keypress = {
     pause: false,
+    hyperspace: false,
     reset: function() {
         this.pause = false;
+        this.hyperspace = false;
     }
 }
 
@@ -36,13 +38,13 @@ Mousetrap.bind('p', function() {
     return false;
 }, 'keydown')
 
-// KEY
-
 // Hyperspace
 Mousetrap.bind('enter', function() {
-    key.hyperspace = true;
+    keypress.hyperspace = true;
     return false;
 }, 'keydown');
+
+// KEY
 
 // Thrust
 keys = ['up', 'i', '8'];

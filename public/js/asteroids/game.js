@@ -435,8 +435,8 @@ function render() {
             }
         }
 
-        if ( key.hyperspace ) {
-            key.hyperspace = false;
+        if ( keypress.hyperspace ) {
+            keypress.hyperspace = false;
             if ( player.hyperspace.cooldown == 0 ) {
                 playerHyperspaceInit();
             }
