@@ -22,9 +22,8 @@ $container['logger'] = function ($c) {
 $container['twig'] = function ($c) {
 	$settings = $c->get('settings')['twig'];
 	$loader = new Twig_Loader_Filesystem($settings['template_path']);
-	/*$twig = new Twig_Environment($loader, [
+	$twig = new Twig_Environment($loader, [
 		'cache' => $settings['cache_path']
-	]);*/
-    $twig = new Twig_Environment($loader);
+	]);
 	return $twig;
 };
