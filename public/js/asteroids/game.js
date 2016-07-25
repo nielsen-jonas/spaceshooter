@@ -91,9 +91,6 @@ var player = {
     weapon: {
         blaster: {
             firerate: .16,
-            recoil: 0,
-            overheat: 0,
-            cooldown: 0
         }
     }
 }
@@ -502,9 +499,6 @@ function render() {
                 if ( player.state.fire_timer.getElapsedTime() >= player.weapon.blaster.firerate ) {
                     player.state.fire_timer = new THREE.Clock( true );
                     fire(spaceship.position.x, spaceship.position.y, spaceship.position.z, player.inertia.x, player.inertia.y, spaceship.rotation.z);
-                    // recoil
-                    player.inertia.x -= Math.cos(toRadians(player.direction)) * player.weapon.blaster.recoil;
-                    player.inertia.y -= Math.sin(toRadians(player.direction)) * player.weapon.blaster.recoil;
                 }
             }
         }
