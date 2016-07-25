@@ -79,7 +79,7 @@ var player = {
         thrust: 1.5,
         strafe: 1.5,
         break: 1.5,
-        rotation: .1
+        rotation: .14
     },
     max: {
         speed: 200,
@@ -87,7 +87,7 @@ var player = {
     },
     passive_deceleration: {
         break: 0.1,
-        rotation: .1
+        rotation: .14
     },
     weapon: {
         blaster: {
