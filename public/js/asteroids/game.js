@@ -218,9 +218,11 @@ function render() {
     function level_complete() {
         for (var i = 0; i <= CtlGame.level; i++) {
             var inertia = rockInertia();
-            inertia.x *= .22;
-            inertia.y *= .22;
-            inertia.z *= .22;
+            if (myRand(0,8) != 0) {
+                inertia.x *= .22;
+                inertia.y *= .22;
+                inertia.z *= .22;
+            }
             var rand_pos = randomViewPosition();
             createRock(
                 3,
@@ -498,9 +500,9 @@ function render() {
         // Functions
         function playerDie() {
             if ( CtlGame.lives > 2 ) {
-                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0xEE0000, 1600, 1.6, .12));
+                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0xBB0000, 1600, 1.6, .12));
             } else if ( CtlGame.lives == 2 ) {
-                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0xEEEE00, 1600, 1.6, .12));
+                CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0xBBBB00, 1600, 1.6, .12));
             } else {
                 CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600, 1.6, .12));
                 CtlGame.explosions.push(new ParticleExplosion(spaceship.position.x, spaceship.position.y, 0x00BB00, 1600));
@@ -1009,7 +1011,7 @@ function render() {
 
     function rockInertia() {
         function rockInertiaRand() {
-            return .002 * myRand( -80, 80);
+            return .002 * myRand( -80, 80) + (CtlGame.level * .0001);
         };
         return {
                 x: rockInertiaRand(),
@@ -1045,7 +1047,7 @@ function render() {
         scene.remove( object );
     }
 
-    function ParticleExplosion(x,y, color = 0xBBBBBB, totalObjects = 400, movementSpeed = .8, objectSize = .06, sizeRandomness = 10000, time = 1000)
+    function ParticleExplosion(x,y, color = 0xBBBBBB, totalObjects = 400, movementSpeed = .8, objectSize = .06, sizeRandomness = 10000, time = 600)
     {
         var geometry = new THREE.Geometry();
         this.dirs = [];
