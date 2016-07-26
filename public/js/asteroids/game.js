@@ -415,7 +415,7 @@ function render() {
         rockUpdate();
 
         // Fire bullet
-        if (key.fire) {
+        if (key.fire && player.state.player == EnumPlayerState.ALIVE) {
             playerWeaponBlasterFire();
         }
 
