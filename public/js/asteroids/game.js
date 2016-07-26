@@ -1053,7 +1053,7 @@ function render() {
         scene.remove( object );
     }
 
-    function ParticleExplosion(x,y, color = 0xBBBBBB, totalObjects = 400, movementSpeed = .8, objectSize = .06, sizeRandomness = 10000, time = 600)
+    function ParticleExplosion(x,y, color = 0xBBBBBB, totalObjects = 400, movementSpeed = .8, objectSize = .06, sizeRandomness = 10000, time = 400)
     {
         var geometry = new THREE.Geometry();
         this.dirs = [];
