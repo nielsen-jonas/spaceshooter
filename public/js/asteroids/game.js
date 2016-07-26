@@ -536,7 +536,7 @@ function render() {
             projectile.position.z = origin_z;
             projectile.rotation.z = rotation_z;
             projectile.inertia = {};
-            projectile.timer = 32;
+            projectile.timer = 28;
             projectile.inertia.x = inertia_x / 380;
             projectile.inertia.y = inertia_y / 380;
             projectile.alive = true;
