@@ -216,6 +216,12 @@ function render() {
         return 0;
     }
     function level_complete() {
+
+        CtlGame.projectiles.forEach( function( projectile, index ) {
+            scene.remove( projectile );
+        });
+        CtlGame.projectiles = [];
+
         for (var i = 0; i <= CtlGame.level; i++) {
             var inertia = rockInertia();
             if (myRand(0,8) != 0) {
